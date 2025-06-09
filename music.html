@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Music Player</title>
-  <link rel="stylesheet" href="styles.css">
   <style>
     body {
-      background: linear-gradient(135deg, #181c2f 0%, #2a225a 60%, #3a1c71 100%);
+      background: #0a0e17;
       color: #fff;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
@@ -15,96 +14,162 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      margin: 0;
+      overflow: hidden;
     }
     .music-player-container {
-      background: rgba(30,34,60,0.7);
-      border-radius: 18px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
-      padding: 2.2rem 2.5rem;
-      min-width: 340px;
+      background: rgba(20, 24, 40, 0.8);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      padding: 2.5rem;
+      width: 90%;
+      max-width: 400px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-top: 2.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .music-title {
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
       text-align: center;
       color: #a29bfe;
+      text-shadow: 0 0 20px rgba(162, 155, 254, 0.3);
     }
     .music-artist {
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 400;
-      margin-bottom: 1.2rem;
+      margin-bottom: 1.5rem;
       text-align: center;
       color: #fff;
       opacity: 0.8;
     }
     .music-controls {
       display: flex;
-      gap: 1.5rem;
-      margin-bottom: 1.2rem;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
       align-items: center;
       justify-content: center;
+      flex-wrap: wrap;
     }
     .music-btn {
-      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 0.6em 1.2em;
-      font-size: 1.1rem;
-      font-weight: 700;
+      background: rgba(162, 155, 254, 0.1);
+      color: #a29bfe;
+      border: 1px solid rgba(162, 155, 254, 0.2);
+      border-radius: 12px;
+      padding: 0.8em 1.4em;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 2px 8px #a29bfe33;
-      transition: background 0.2s, transform 0.2s;
+      transition: all 0.3s ease;
     }
     .music-btn:hover {
-      background: linear-gradient(90deg, #a29bfe 30%, #ff70a6 70%);
-      transform: scale(1.05);
+      background: rgba(162, 155, 254, 0.2);
+      transform: translateY(-2px);
+    }
+    .music-btn:active {
+      transform: translateY(0);
+    }
+    .volume-control {
+      display: flex;
+      align-items: center;
+      gap: 0.8em;
+      margin-left: 1em;
+      padding: 0.5em 1em;
+      background: rgba(162, 155, 254, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(162, 155, 254, 0.2);
+    }
+    .volume-control input[type="range"] {
+      width: 100px;
+      accent-color: #a29bfe;
+      background: transparent;
     }
     .music-playlist {
-      margin-top: 1.2rem;
       width: 100%;
-      max-width: 340px;
-      background: rgba(30,34,60,0.5);
-      border-radius: 10px;
-      padding: 0.7em 0.5em;
-      font-size: 1em;
-      list-style: none;
+      max-height: 200px;
       overflow-y: auto;
-      max-height: 180px;
+      padding: 0.5em;
+      background: rgba(162, 155, 254, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(162, 155, 254, 0.1);
+    }
+    .music-playlist::-webkit-scrollbar {
+      width: 6px;
+    }
+    .music-playlist::-webkit-scrollbar-track {
+      background: rgba(162, 155, 254, 0.1);
+      border-radius: 3px;
+    }
+    .music-playlist::-webkit-scrollbar-thumb {
+      background: rgba(162, 155, 254, 0.3);
+      border-radius: 3px;
     }
     .music-playlist li {
-      padding: 0.4em 0.7em;
-      border-radius: 6px;
+      padding: 0.8em 1em;
+      margin-bottom: 0.5em;
+      border-radius: 8px;
       cursor: pointer;
-      color: #fff;
-      transition: background 0.15s, color 0.15s;
-      margin-bottom: 0.2em;
+      transition: all 0.2s ease;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      gap: 0.3em;
     }
     .music-playlist li.active {
-      background: #a29bfe33;
-      color: #ff70a6;
-      font-weight: 700;
-    }
-    .music-playlist li:hover {
-      background: #a29bfe22;
+      background: rgba(162, 155, 254, 0.15);
       color: #a29bfe;
     }
+    .music-playlist li:hover {
+      background: rgba(162, 155, 254, 0.1);
+    }
+    .music-playlist li span {
+      font-weight: 600;
+    }
+    .music-playlist li small {
+      opacity: 0.7;
+      font-size: 0.9em;
+    }
+    .progress-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(162, 155, 254, 0.1);
+      border-radius: 2px;
+      margin: 1.5rem 0;
+      cursor: pointer;
+      position: relative;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #a29bfe;
+      border-radius: 2px;
+      width: 0;
+      transition: width 0.1s linear;
+    }
+    .time-display {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 0.9em;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 0.5em;
+    }
     .music-yt {
-      display: none; /* Hide the YouTube video, audio only */
+      display: none;
     }
     @media (max-width: 500px) {
       .music-player-container {
-        min-width: 0;
-        width: 98vw;
-        max-width: 98vw;
+        width: 95%;
+        padding: 1.5rem;
+      }
+      .music-controls {
+        gap: 0.8rem;
+      }
+      .volume-control {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
@@ -113,14 +178,25 @@
   <div class="music-player-container">
     <div class="music-title" id="music-title">Loading...</div>
     <div class="music-artist" id="music-artist"></div>
-    <div class="music-yt" id="music-yt"></div>
+    <div class="progress-container" id="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="time-display">
+      <span id="current-time">0:00</span>
+      <span id="total-time">0:00</span>
+    </div>
     <div class="music-controls">
-      <button class="music-btn" id="prev-btn">⏮ Prev</button>
-      <button class="music-btn" id="play-btn">▶️ Play</button>
-      <button class="music-btn" id="next-btn">⏭ Next</button>
+      <button class="music-btn" id="prev-btn">⏮</button>
+      <button class="music-btn" id="play-btn">▶■</button>
+      <button class="music-btn" id="next-btn">⏭</button>
+      <div class="volume-control">
+        <span style="color: #a29bfe;">🔊</span>
+        <input type="range" id="volume-slider" min="0" max="100" value="100">
+      </div>
     </div>
     <ul class="music-playlist" id="music-playlist"></ul>
   </div>
+  <div class="music-yt" id="music-yt"></div>
   <script>
     // YouTube IFrame API loader
     let tag = document.createElement('script');
@@ -136,6 +212,23 @@
     let current = 0;
     let player;
     let playing = false;
+    let progressInterval;
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      seconds = Math.floor(seconds % 60);
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function updateProgress() {
+      if (!player) return;
+      const currentTime = player.getCurrentTime();
+      const duration = player.getDuration();
+      const progress = (currentTime / duration) * 100;
+      document.getElementById('progress-bar').style.width = `${progress}%`;
+      document.getElementById('current-time').textContent = formatTime(currentTime);
+      document.getElementById('total-time').textContent = formatTime(duration);
+    }
 
     function getYoutubeId(url) {
       const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]{11})/);
@@ -152,7 +245,7 @@
       ul.innerHTML = '';
       songList.forEach((song, i) => {
         const li = document.createElement('li');
-        li.innerHTML = `<span>${song.title}</span><small style='opacity:0.7;'>${song.artist}</small>`;
+        li.innerHTML = `<span>${song.title}</span><small>${song.artist}</small>`;
         if (i === current) li.classList.add('active');
         li.onclick = () => { loadSong(i); };
         ul.appendChild(li);
@@ -167,7 +260,8 @@
       if (player) {
         player.loadVideoById(vid);
         playing = true;
-        document.getElementById('play-btn').textContent = '⏸ Pause';
+        document.getElementById('play-btn').textContent = '⏸';
+        startProgressUpdate();
       } else {
         createPlayer(vid);
       }
@@ -180,7 +274,9 @@
         events: {
           'onReady': () => {
             playing = true;
-            document.getElementById('play-btn').textContent = '⏸ Pause';
+            document.getElementById('play-btn').textContent = '⏸';
+            player.setVolume(document.getElementById('volume-slider').value);
+            startProgressUpdate();
           },
           'onStateChange': (e) => {
             if (e.data === YT.PlayerState.ENDED) nextSong();
@@ -189,30 +285,57 @@
       });
     }
 
+    function startProgressUpdate() {
+      if (progressInterval) clearInterval(progressInterval);
+      progressInterval = setInterval(updateProgress, 1000);
+    }
+
     function playPause() {
       if (!player) return;
       if (playing) {
         player.pauseVideo();
         playing = false;
-        document.getElementById('play-btn').textContent = '▶️ Play';
+        document.getElementById('play-btn').textContent = '▶■';
+        clearInterval(progressInterval);
       } else {
         player.playVideo();
         playing = true;
-        document.getElementById('play-btn').textContent = '⏸ Pause';
+        document.getElementById('play-btn').textContent = '⏸';
+        startProgressUpdate();
       }
     }
+
     function nextSong() {
       loadSong((current + 1) % songList.length);
     }
+
     function prevSong() {
       loadSong((current - 1 + songList.length) % songList.length);
     }
+
+    function seekTo(e) {
+      if (!player) return;
+      const rect = e.target.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = x / rect.width;
+      const duration = player.getDuration();
+      player.seekTo(duration * percentage);
+    }
+
     document.getElementById('play-btn').onclick = playPause;
     document.getElementById('next-btn').onclick = nextSong;
     document.getElementById('prev-btn').onclick = prevSong;
+    document.getElementById('volume-slider').addEventListener('input', function(e) {
+      if (player) {
+        player.setVolume(e.target.value);
+      }
+    });
+    document.getElementById('progress-container').addEventListener('click', seekTo);
+
     window.onYouTubeIframeAPIReady = function() {
       loadSong(current);
     };
+
     updateTitle();
     updatePlaylist();
   </script>

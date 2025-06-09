@@ -81,14 +81,24 @@
       <input id="star-slider" type="range" min="50" max="700" value="350" style="accent-color:#a29bfe;width:110px;vertical-align:middle;">
       <span id="star-slider-value" style="font-size:1em;color:#fff;min-width:2.5em;text-align:right;">350</span>
     </div>
-    <div id="mini-music-player" style="position:fixed;right:1.5rem;bottom:5.5rem;z-index:20;min-width:220px;max-width:320px;background:rgba(30,34,60,0.7);backdrop-filter:blur(6px);border-radius:1em;box-shadow:0 2px 12px #0002;padding:0.7em 1.2em 0.7em 1em;display:flex;flex-direction:column;align-items:flex-start;gap:0.3em;">
-      <div style="font-size:1em;font-weight:700;color:#a29bfe;" id="mini-music-title">Loading...</div>
+    <div id="mini-music-player" style="position:fixed;right:1.5rem;bottom:5.5rem;z-index:20;min-width:220px;max-width:320px;background:rgba(20,24,40,0.8);backdrop-filter:blur(12px);border-radius:1em;box-shadow:0 8px 32px rgba(0,0,0,0.2);padding:1.2em;display:flex;flex-direction:column;align-items:flex-start;gap:0.5em;border:1px solid rgba(255,255,255,0.1);">
+      <div style="font-size:1.1em;font-weight:700;color:#a29bfe;text-shadow:0 0 20px rgba(162,155,254,0.3);" id="mini-music-title">Loading...</div>
       <div style="font-size:0.95em;color:#fff;opacity:0.8;" id="mini-music-artist"></div>
-      <div id="mini-music-yt" style="display:none;"></div>
-      <div style="display:flex;gap:0.7em;margin-top:0.2em;">
-        <button id="mini-prev-btn" style="background:none;border:none;color:#a29bfe;font-size:1.2em;cursor:pointer;">⏮</button>
-        <button id="mini-play-btn" style="background:linear-gradient(90deg,#ff70a6 30%,#a29bfe 70%);color:#fff;border:none;border-radius:6px;padding:0.2em 0.9em;font-size:1em;font-weight:700;cursor:pointer;box-shadow:0 2px 8px #a29bfe33;">▶️</button>
-        <button id="mini-next-btn" style="background:none;border:none;color:#a29bfe;font-size:1.2em;cursor:pointer;">⏭</button>
+      <div style="width:100%;height:3px;background:rgba(162,155,254,0.1);border-radius:2px;margin:0.5em 0;cursor:pointer;position:relative;" id="mini-progress-container">
+        <div style="height:100%;background:#a29bfe;border-radius:2px;width:0;transition:width 0.1s linear;" id="mini-progress-bar"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;width:100%;font-size:0.8em;color:rgba(255,255,255,0.6);">
+        <span id="mini-current-time">0:00</span>
+        <span id="mini-total-time">0:00</span>
+      </div>
+      <div style="display:flex;gap:0.7em;margin-top:0.2em;align-items:center;flex-wrap:wrap;">
+        <button id="mini-prev-btn" style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);color:#a29bfe;font-size:1.1em;cursor:pointer;border-radius:8px;padding:0.4em 0.8em;transition:all 0.3s ease;">⏮</button>
+        <button id="mini-play-btn" style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);color:#a29bfe;font-size:1.1em;cursor:pointer;border-radius:8px;padding:0.4em 0.8em;transition:all 0.3s ease;">▶■</button>
+        <button id="mini-next-btn" style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);color:#a29bfe;font-size:1.1em;cursor:pointer;border-radius:8px;padding:0.4em 0.8em;transition:all 0.3s ease;">⏭</button>
+        <div style="display:flex;align-items:center;gap:0.5em;padding:0.4em 0.8em;background:rgba(162,155,254,0.1);border-radius:8px;border:1px solid rgba(162,155,254,0.2);">
+          <span style="color:#a29bfe;font-size:0.9em;">🔊</span>
+          <input type="range" id="mini-volume-slider" min="0" max="100" value="100" style="accent-color:#a29bfe;width:80px;vertical-align:middle;">
+        </div>
       </div>
     </div>
     <style>
@@ -157,6 +167,38 @@
     let miniCurrent = 0;
     let miniPlayer;
     let miniPlaying = false;
+    let miniProgressInterval;
+
+    function formatMiniTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      seconds = Math.floor(seconds % 60);
+      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function updateMiniProgress() {
+      if (!miniPlayer) return;
+      const currentTime = miniPlayer.getCurrentTime();
+      const duration = miniPlayer.getDuration();
+      const progress = (currentTime / duration) * 100;
+      document.getElementById('mini-progress-bar').style.width = `${progress}%`;
+      document.getElementById('mini-current-time').textContent = formatMiniTime(currentTime);
+      document.getElementById('mini-total-time').textContent = formatMiniTime(duration);
+    }
+
+    function startMiniProgressUpdate() {
+      if (miniProgressInterval) clearInterval(miniProgressInterval);
+      miniProgressInterval = setInterval(updateMiniProgress, 1000);
+    }
+
+    function miniSeekTo(e) {
+      if (!miniPlayer) return;
+      const rect = e.target.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = x / rect.width;
+      const duration = miniPlayer.getDuration();
+      miniPlayer.seekTo(duration * percentage);
+    }
+
     function getMiniYoutubeId(url) {
       const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]{11})/);
       return match ? match[1] : null;
@@ -164,18 +206,6 @@
     function updateMiniTitle() {
       document.getElementById('mini-music-title').textContent = miniSongList[miniCurrent].title || miniSongList[miniCurrent].url;
       document.getElementById('mini-music-artist').textContent = miniSongList[miniCurrent].artist || '';
-    }
-    function loadMiniSong(idx) {
-      miniCurrent = idx;
-      updateMiniTitle();
-      const vid = getMiniYoutubeId(miniSongList[miniCurrent].url);
-      if (miniPlayer) {
-        miniPlayer.loadVideoById(vid);
-        miniPlaying = true;
-        document.getElementById('mini-play-btn').textContent = '⏸';
-      } else {
-        createMiniPlayer(vid);
-      }
     }
     function createMiniPlayer(vid) {
       miniPlayer = new YT.Player('mini-music-yt', {
@@ -185,6 +215,8 @@
           'onReady': () => {
             miniPlaying = true;
             document.getElementById('mini-play-btn').textContent = '⏸';
+            miniPlayer.setVolume(document.getElementById('mini-volume-slider').value);
+            startMiniProgressUpdate();
           },
           'onStateChange': (e) => {
             if (e.data === YT.PlayerState.ENDED) miniNextSong();
@@ -197,11 +229,26 @@
       if (miniPlaying) {
         miniPlayer.pauseVideo();
         miniPlaying = false;
-        document.getElementById('mini-play-btn').textContent = '▶️';
+        document.getElementById('mini-play-btn').textContent = '▶■';
+        clearInterval(miniProgressInterval);
       } else {
         miniPlayer.playVideo();
         miniPlaying = true;
         document.getElementById('mini-play-btn').textContent = '⏸';
+        startMiniProgressUpdate();
+      }
+    }
+    function loadMiniSong(idx) {
+      miniCurrent = idx;
+      updateMiniTitle();
+      const vid = getMiniYoutubeId(miniSongList[miniCurrent].url);
+      if (miniPlayer) {
+        miniPlayer.loadVideoById(vid);
+        miniPlaying = true;
+        document.getElementById('mini-play-btn').textContent = '⏸';
+        startMiniProgressUpdate();
+      } else {
+        createMiniPlayer(vid);
       }
     }
     function miniNextSong() {
@@ -213,6 +260,7 @@
     document.getElementById('mini-play-btn').onclick = miniPlayPause;
     document.getElementById('mini-next-btn').onclick = miniNextSong;
     document.getElementById('mini-prev-btn').onclick = miniPrevSong;
+    document.getElementById('mini-progress-container').addEventListener('click', miniSeekTo);
     window.onYouTubeIframeAPIReady = function() {
       if (!window._mainMusicLoaded) {
         window._mainMusicLoaded = true;
@@ -220,6 +268,11 @@
       }
     };
     updateMiniTitle();
+    document.getElementById('mini-volume-slider').addEventListener('input', function(e) {
+      if (miniPlayer) {
+        miniPlayer.setVolume(e.target.value);
+      }
+    });
     </script>
 </body>
 </html> 

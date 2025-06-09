@@ -20,13 +20,11 @@
       font-size: 2rem;
       font-weight: 900;
       margin-bottom: 1.2rem;
-      color: #43e97b;
+      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       text-align: center;
-    }
-    .sudoku-lives {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1.2rem;
     }
     .sudoku-board {
       display: grid;
@@ -44,7 +42,7 @@
       height: 2.2em;
       text-align: center;
       font-size: 1.3em;
-      border: 1.5px solid #3a1c71;
+      border: none;
       border-radius: 6px;
       background: #23234a;
       color: #fff;
@@ -57,11 +55,11 @@
     }
     .sudoku-cell[readonly] {
       background: #3a1c71;
-      color: #a29bfe;
+      color: #ff70a6;
       font-weight: 700;
     }
-    .sudoku-btn, .back-btn, .restart-btn {
-      background: #43e97b;
+    .sudoku-btn, .back-btn {
+      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -70,12 +68,11 @@
       font-weight: 700;
       margin: 0 0.5em;
       cursor: pointer;
-      box-shadow: 0 2px 8px #43e97b33;
+      box-shadow: 0 2px 8px #a29bfe33;
       transition: background 0.2s, transform 0.2s;
     }
-    .sudoku-btn:hover, .back-btn:hover, .restart-btn:hover {
-      background: #2ecf6b;
-      color: #fff;
+    .sudoku-btn:hover, .back-btn:hover {
+      background: linear-gradient(90deg, #a29bfe 30%, #ff70a6 70%);
       transform: scale(1.05);
     }
     .sudoku-message {
@@ -84,155 +81,85 @@
       font-weight: 700;
       min-height: 1.5em;
       text-align: center;
-      color: #fff;
-    }
-    .sudoku-loading {
-      display: none;
-      text-align: center;
-      margin: 1.2em 0;
-      font-size: 1.1em;
-      color: #a29bfe;
     }
   </style>
 </head>
 <body>
   <div class="sudoku-title">Sudoku</div>
-  <div class="sudoku-lives" id="sudoku-lives">❤️❤️❤️</div>
   <div class="sudoku-board" id="sudoku-board"></div>
-  <div class="sudoku-loading" id="sudoku-loading" style="display:none;text-align:center;margin:1.2em 0;font-size:1.1em;color:#a29bfe;">Loading new puzzle...</div>
   <div>
-    <button class="sudoku-btn" type="button" disabled>Check</button>
-    <button class="restart-btn sudoku-btn" onclick="restartGame()">🔄 Restart</button>
+    <button class="sudoku-btn" onclick="checkSudoku()">Check</button>
     <button class="back-btn" onclick="window.location.href='minigames.html'">Back to Lobby</button>
   </div>
   <div class="sudoku-message" id="sudoku-message"></div>
   <script>
-    let puzzle, solution;
-    let board = document.getElementById('sudoku-board');
+    // Simple Sudoku puzzle (0 = empty)
+    const puzzle = [
+      [5,3,0,0,7,0,0,0,0],
+      [6,0,0,1,9,5,0,0,0],
+      [0,9,8,0,0,0,0,6,0],
+      [8,0,0,0,6,0,0,0,3],
+      [4,0,0,8,0,3,0,0,1],
+      [7,0,0,0,2,0,0,0,6],
+      [0,6,0,0,0,0,2,8,0],
+      [0,0,0,4,1,9,0,0,5],
+      [0,0,0,0,8,0,0,7,9]
+    ];
+    // Solution for checking
+    const solution = [
+      [5,3,4,6,7,8,9,1,2],
+      [6,7,2,1,9,5,3,4,8],
+      [1,9,8,3,4,2,5,6,7],
+      [8,5,9,7,6,1,4,2,3],
+      [4,2,6,8,5,3,7,9,1],
+      [7,1,3,9,2,4,8,5,6],
+      [9,6,1,5,3,7,2,8,4],
+      [2,8,7,4,1,9,6,3,5],
+      [3,4,5,2,8,6,1,7,9]
+    ];
+    const board = document.getElementById('sudoku-board');
     const message = document.getElementById('sudoku-message');
-    const livesEl = document.getElementById('sudoku-lives');
-    const loadingEl = document.getElementById('sudoku-loading');
     let cells = [];
-    let lives = 3;
-    let gameOver = false;
-
-    async function fetchSudoku() {
-      loadingEl.style.display = 'block';
-      board.innerHTML = '';
-      message.textContent = '';
-      try {
-        const res = await fetch('https://sudoku-api.vercel.app/api/dosuku?query={newboard(limit:1){grids{value,solution}}}');
-        const data = await res.json();
-        const grid = data.data.newboard.grids[0];
-        puzzle = grid.value;
-        solution = grid.solution;
-      } catch (e) {
-        message.textContent = 'Failed to load puzzle. Try again.';
-        message.style.color = '#ff70a6';
-        puzzle = null;
-        solution = null;
-      }
-      loadingEl.style.display = 'none';
-    }
-
-    function renderBoard() {
-      board.innerHTML = '';
-      cells = [];
-      for (let r = 0; r < 9; r++) {
-        cells[r] = [];
-        for (let c = 0; c < 9; c++) {
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.maxLength = 1;
-          input.className = 'sudoku-cell';
-          // Add thick borders for 3x3 boxes and grid lines
-          let borderStyle = '';
-          if (c % 3 === 0) borderStyle += 'border-left: 3px solid #a29bfe;';
-          if (r % 3 === 0) borderStyle += 'border-top: 3px solid #a29bfe;';
-          if (c === 8) borderStyle += 'border-right: 3px solid #a29bfe;';
-          if (r === 8) borderStyle += 'border-bottom: 3px solid #a29bfe;';
-          input.style = borderStyle;
-          if (puzzle && puzzle[r][c] !== 0) {
-            input.value = puzzle[r][c];
-            input.readOnly = true;
-          }
-          if (!puzzle) input.disabled = true;
-          input.oninput = () => {
-            if (gameOver) return input.value = '';
-            input.value = input.value.replace(/[^1-9]/g, '');
-            checkSudoku(r, c, input);
-          };
-          board.appendChild(input);
-          cells[r][c] = input;
+    // Render board
+    for (let r = 0; r < 9; r++) {
+      cells[r] = [];
+      for (let c = 0; c < 9; c++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.maxLength = 1;
+        input.className = 'sudoku-cell';
+        if (puzzle[r][c] !== 0) {
+          input.value = puzzle[r][c];
+          input.readOnly = true;
         }
+        input.oninput = () => {
+          input.value = input.value.replace(/[^1-9]/g, '');
+        };
+        board.appendChild(input);
+        cells[r][c] = input;
       }
     }
-    function updateLives() {
-      livesEl.textContent = '❤️'.repeat(lives) + '🤍'.repeat(3 - lives);
-    }
-    function checkSudoku(row, col, inputEl) {
-      if (gameOver) return;
+    function checkSudoku() {
       let correct = true;
-      let madeMistake = false;
       for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
           const val = parseInt(cells[r][c].value, 10);
           if (val !== solution[r][c]) {
             correct = false;
-            if (cells[r][c] === inputEl && val) {
-              madeMistake = true;
-              cells[r][c].style.background = '#ff70a633';
-            } else if (!cells[r][c].readOnly) {
-              cells[r][c].style.background = '#23234a';
-            }
+            cells[r][c].style.background = '#ff70a633';
           } else {
             if (!cells[r][c].readOnly) cells[r][c].style.background = '#23234a';
           }
         }
       }
-      if (madeMistake) {
-        lives--;
-        updateLives();
-        if (lives <= 0) {
-          gameOver = true;
-          message.textContent = '💀 Game Over! Solution revealed.';
-          message.style.color = '#ff70a6';
-          // Reveal solution
-          for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-              cells[r][c].value = solution[r][c];
-              cells[r][c].readOnly = true;
-              cells[r][c].style.background = '#3a1c71';
-              cells[r][c].style.color = '#ff70a6';
-            }
-          }
-          updateLives();
-          return;
-        }
-      }
-      if (correct && !gameOver) {
+      if (correct) {
         message.textContent = '🎉 Correct! You solved the puzzle!';
         message.style.color = '#ff70a6';
-      } else if (!gameOver) {
+      } else {
         message.textContent = 'Some cells are incorrect. Try again!';
         message.style.color = '#fff';
       }
     }
-    async function restartGame() {
-      lives = 3;
-      gameOver = false;
-      message.textContent = '';
-      message.style.color = '#fff';
-      updateLives();
-      await fetchSudoku();
-      renderBoard();
-    }
-    // Initial render
-    (async function() {
-      await fetchSudoku();
-      renderBoard();
-      updateLives();
-    })();
   </script>
 </body>
 </html> 
