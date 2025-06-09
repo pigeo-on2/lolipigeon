@@ -1,108 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="HaToLi's Personal Site - Rhythm Game Enthusiast & Developer">
+    <!-- Primary Meta Tags -->
+    <title>pigeon's space</title>
+    <meta name="title" content="pigeon's space" />
+    <meta name="description" content="pigeons fly high" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lolipigeon.xyz/" />
+    <meta property="og:title" content="pigeon's space" />
+    <meta property="og:description" content="pigeons fly high" />
+    <meta property="og:image" content="logo.jpg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://lolipigeon.xyz/" />
+    <meta property="twitter:title" content="pigeon's space" />
+    <meta property="twitter:description" content="pigeons fly high" />
+    <meta property="twitter:image" content="logo.jpg" />
+
     <meta name="theme-color" content="#ff70a6">
-    <title>HaToLi's Space</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>🎮 HaToLi's Space</h1>
-            <p class="tagline">Rhythm Game Enthusiast & Developer</p>
-        </header>
-
-        <section class="about-section">
-            <h2>About Me</h2>
-            <p>안녕하세요! 저는 리듬게임을 좋아하는 HaToLi입니다. 프로젝트 세카이와 CHUNITHM을 주로 플레이하고 있어요. 새로운 리듬게임을 발견하는 것도 좋아합니다!</p>
-            <p>개발자로서 Python, C++, C#을 다룰 수 있으며, AI 개발과 사이버 보안에 큰 관심을 가지고 있습니다.</p>
-        </section>
-
-        <section class="skills-section">
-            <h2>Development Skills</h2>
-            <div class="skills-grid">
-                <div class="skill-card">
-                    <span class="skill-icon">🐍</span>
-                    <h3>Python</h3>
-                    <p>AI & Machine Learning</p>
-                </div>
-                <div class="skill-card">
-                    <span class="skill-icon">⚡</span>
-                    <h3>C++</h3>
-                    <p>System Programming</p>
-                </div>
-                <div class="skill-card">
-                    <span class="skill-icon">🎮</span>
-                    <h3>C#</h3>
-                    <p>Game Development</p>
-                </div>
+    <div class="main-grid">
+        <div class="profile-card card">
+            <div class="profile-title">
+                <span class="profile-emoji">🎮</span>
+                <span class="profile-name">HaToLi</span>
             </div>
-        </section>
-
-        <section class="interests-section">
-            <h2>Interests</h2>
-            <div class="interests-grid">
-                <div class="interest-card">
-                    <span class="interest-icon">🤖</span>
-                    <h3>AI Development</h3>
-                    <p>Machine Learning & Deep Learning</p>
-                </div>
-                <div class="interest-card">
-                    <span class="interest-icon">🔒</span>
-                    <h3>Cyber Security</h3>
-                    <p>Network Security & Ethical Hacking</p>
-                </div>
+            <div class="profile-desc">Rhythm Game & AI Dev</div>
+            <div class="profile-social">
+                <a href="https://discord.com/users/pigeo_on2" title="Discord" target="_blank">💬</a>
+                <a href="https://twitter.com/pigeo_on2" title="Twitter" target="_blank">🐦</a>
             </div>
-        </section>
-
-        <section class="games-section">
-            <h2>Favorite Games</h2>
-            <div class="games-grid">
-                <div class="game-card">
-                    <span class="game-icon">🎵</span>
-                    <h3>プロジェクトセカイ</h3>
-                    <p>Project Sekai: Colorful Stage!</p>
-                    <p class="game-detail">Favorite Unit: 25時、ナイトコードで。</p>
-                </div>
-                <div class="game-card">
-                    <span class="game-icon">🎹</span>
-                    <h3>CHUNITHM</h3>
-                    <p>Chunithm</p>
-                    <p class="game-detail">Favorite Song: まだダメよ</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="social-section">
-            <h2>Connect With Me</h2>
-            <div class="social-grid">
-                <a href="https://discord.com/users/pigeo_on2" class="social-card discord">
-                    <span class="social-icon">💬</span>
-                    <h3>Discord</h3>
-                    <p>pigeo_on2</p>
-                </a>
-                <a href="https://twitter.com/pigeo_on2" class="social-card twitter">
-                    <span class="social-icon">🐦</span>
-                    <h3>Twitter</h3>
-                    <p>@pigeo_on2</p>
-                </a>
-            </div>
-        </section>
-
-        <section class="contact-section">
-            <h2>Let's Connect!</h2>
-            <p>리듬게임, 개발, AI, 사이버 보안에 대해 이야기하고 싶으시다면 언제든지 연락주세요!</p>
-            <div class="contact-links">
-                <a href="https://discord.com/users/pigeo_on2" class="contact-link">Discord</a>
-                <a href="https://twitter.com/pigeo_on2" class="contact-link">Twitter</a>
-            </div>
-        </section>
+        </div>
+        <div class="about-card card">
+            <div class="card-title">About</div>
+            <div class="card-content">리듬게임과 개발을 사랑합니다.<br>Python, C++, C#<br>AI, 보안 관심</div>
+        </div>
+        <div class="skills-card card">
+            <div class="card-title">Skills</div>
+            <ul>
+                <li>🐍 Python</li>
+                <li>⚡ C++</li>
+                <li>🎮 C#</li>
+            </ul>
+        </div>
+        <div class="interests-card card">
+            <div class="card-title">Interests</div>
+            <ul>
+                <li>🤖 AI</li>
+                <li>🔒 Security</li>
+            </ul>
+        </div>
+        <div class="games-card card">
+            <div class="card-title">Games</div>
+            <ul>
+                <li>🎵 プロセカ<br><small>25時、ナイトコードで。</small></li>
+                <li>🎹 CHUNITHM<br><small>まだダメよ</small></li>
+            </ul>
+        </div>
     </div>
 </body>
 </html> 
