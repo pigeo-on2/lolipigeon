@@ -1,5 +1,5 @@
 // Animated starfield background
-const STAR_COUNT = 350;
+let STAR_COUNT = 350;
 const STAR_COLORS = ['#fff', '#b3b8ff', '#a29bfe', '#ffe6fa', '#c7d2fe'];
 const STAR_SIZE = [0.7, 1.2, 1.7];
 const STAR_SPEED = [0.02, 0.04, 0.07];
@@ -26,22 +26,35 @@ window.addEventListener('resize', () => {
   h = window.innerHeight;
   canvas.width = w;
   canvas.height = h;
+  resetStars();
 });
 
 function randomBetween(a, b) {
   return a + Math.random() * (b - a);
 }
 
-const stars = Array.from({ length: STAR_COUNT }, () => {
-  return {
-    x: Math.random() * w,
-    y: Math.random() * h,
-    r: STAR_SIZE[Math.floor(Math.random() * STAR_SIZE.length)],
-    color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
-    speed: STAR_SPEED[Math.floor(Math.random() * STAR_SPEED.length)],
-    twinkle: Math.random() * Math.PI * 2,
-  };
-});
+let stars = [];
+function createStars(count) {
+  return Array.from({ length: count }, () => {
+    return {
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: STAR_SIZE[Math.floor(Math.random() * STAR_SIZE.length)],
+      color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+      speed: STAR_SPEED[Math.floor(Math.random() * STAR_SPEED.length)],
+      twinkle: Math.random() * Math.PI * 2,
+    };
+  });
+}
+
+function resetStars() {
+  stars = createStars(STAR_COUNT);
+}
+
+function setStarCount(newCount) {
+  STAR_COUNT = newCount;
+  resetStars();
+}
 
 function drawStars() {
   ctx.clearRect(0, 0, w, h);
@@ -66,4 +79,8 @@ function drawStars() {
   requestAnimationFrame(drawStars);
 }
 
-drawStars(); 
+resetStars();
+drawStars();
+
+// Expose for external use
+window.setStarCount = setStarCount; 

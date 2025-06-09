@@ -29,14 +29,14 @@
     }
     .star {
       position: absolute;
-      width: 70px;
-      height: 70px;
+      width: 50px;
+      height: 50px;
       background: none;
       cursor: pointer;
       transition: filter 0.1s;
       filter: drop-shadow(0 0 12px #fff8);
       user-select: none;
-      font-size: 3.2rem;
+      font-size: 2.2rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -49,9 +49,10 @@
       font-weight: 700;
       margin-bottom: 1rem;
       text-shadow: 0 2px 8px #23234a44;
+      color: #fff;
     }
     .reset-btn, .back-btn {
-      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
+      background: #a29bfe;
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -64,17 +65,15 @@
       transition: background 0.2s, transform 0.2s;
     }
     .reset-btn:hover, .back-btn:hover {
-      background: linear-gradient(90deg, #a29bfe 30%, #ff70a6 70%);
+      background: #7c6ee6;
+      color: #fff;
       transform: scale(1.05);
     }
     .minigame-title {
       font-size: 2rem;
       font-weight: 900;
       margin-bottom: 1.2rem;
-      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #b3c6ff;
       text-align: center;
     }
   </style>
@@ -85,18 +84,20 @@
   <div id="game-area"></div>
   <div>
     <button class="reset-btn" onclick="resetGame()">Reset</button>
-    <button class="back-btn" onclick="window.location.href='index.html'">Back to Main</button>
+    <button class="back-btn" onclick="window.location.href='minigames.html'">Back to Lobby</button>
   </div>
   <script>
     const gameArea = document.getElementById('game-area');
     const scoreEl = document.getElementById('score');
     let score = 0;
     let star = null;
-    let moveInterval = null;
+    let starX = 0, starY = 0, targetX = 0, targetY = 0;
+    let animating = false;
+    let moveTimer = null;
 
     function randomPos() {
-      const x = Math.random() * (gameArea.clientWidth - 40);
-      const y = Math.random() * (gameArea.clientHeight - 40);
+      const x = Math.random() * (gameArea.clientWidth - 50);
+      const y = Math.random() * (gameArea.clientHeight - 50);
       return { x, y };
     }
 
@@ -106,6 +107,10 @@
       star.className = 'star';
       star.innerHTML = '⭐';
       const { x, y } = randomPos();
+      starX = x;
+      starY = y;
+      targetX = x;
+      targetY = y;
       star.style.left = x + 'px';
       star.style.top = y + 'px';
       star.onclick = () => {
@@ -114,17 +119,43 @@
         moveStar();
       };
       gameArea.appendChild(star);
+      animating = false;
+      moveStar();
     }
 
     function moveStar() {
       const { x, y } = randomPos();
-      star.style.left = x + 'px';
-      star.style.top = y + 'px';
+      targetX = x;
+      targetY = y;
+      if (!animating) animateStar();
+    }
+
+    function animateStar() {
+      animating = true;
+      function step() {
+        const dx = targetX - starX;
+        const dy = targetY - starY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 2) {
+          starX = targetX;
+          starY = targetY;
+          star.style.left = starX + 'px';
+          star.style.top = starY + 'px';
+          animating = false;
+          return;
+        }
+        starX += dx * 0.08;
+        starY += dy * 0.08;
+        star.style.left = starX + 'px';
+        star.style.top = starY + 'px';
+        requestAnimationFrame(step);
+      }
+      step();
     }
 
     function startMoving() {
-      if (moveInterval) clearInterval(moveInterval);
-      moveInterval = setInterval(() => {
+      if (moveTimer) clearInterval(moveTimer);
+      moveTimer = setInterval(() => {
         moveStar();
       }, 900);
     }

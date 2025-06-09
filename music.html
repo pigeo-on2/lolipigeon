@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Player</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #181c2f 0%, #2a225a 60%, #3a1c71 100%);
+      color: #fff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .music-player-container {
+      background: rgba(30,34,60,0.7);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+      padding: 2.2rem 2.5rem;
+      min-width: 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 2.5rem;
+    }
+    .music-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: #a29bfe;
+    }
+    .music-artist {
+      font-size: 1rem;
+      font-weight: 400;
+      margin-bottom: 1.2rem;
+      text-align: center;
+      color: #fff;
+      opacity: 0.8;
+    }
+    .music-controls {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.2rem;
+      align-items: center;
+      justify-content: center;
+    }
+    .music-btn {
+      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6em 1.2em;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #a29bfe33;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .music-btn:hover {
+      background: linear-gradient(90deg, #a29bfe 30%, #ff70a6 70%);
+      transform: scale(1.05);
+    }
+    .music-playlist {
+      margin-top: 1.2rem;
+      width: 100%;
+      max-width: 340px;
+      background: rgba(30,34,60,0.5);
+      border-radius: 10px;
+      padding: 0.7em 0.5em;
+      font-size: 1em;
+      list-style: none;
+      overflow-y: auto;
+      max-height: 180px;
+    }
+    .music-playlist li {
+      padding: 0.4em 0.7em;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #fff;
+      transition: background 0.15s, color 0.15s;
+      margin-bottom: 0.2em;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .music-playlist li.active {
+      background: #a29bfe33;
+      color: #ff70a6;
+      font-weight: 700;
+    }
+    .music-playlist li:hover {
+      background: #a29bfe22;
+      color: #a29bfe;
+    }
+    .music-yt {
+      display: none; /* Hide the YouTube video, audio only */
+    }
+    @media (max-width: 500px) {
+      .music-player-container {
+        min-width: 0;
+        width: 98vw;
+        max-width: 98vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="music-player-container">
+    <div class="music-title" id="music-title">Loading...</div>
+    <div class="music-artist" id="music-artist"></div>
+    <div class="music-yt" id="music-yt"></div>
+    <div class="music-controls">
+      <button class="music-btn" id="prev-btn">⏮ Prev</button>
+      <button class="music-btn" id="play-btn">▶️ Play</button>
+      <button class="music-btn" id="next-btn">⏭ Next</button>
+    </div>
+    <ul class="music-playlist" id="music-playlist"></ul>
+  </div>
+  <script>
+    // YouTube IFrame API loader
+    let tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+
+    // Parse songs.txt (hardcoded for now, but can be fetched via AJAX if served)
+    const songRaw = `https://youtu.be/g5HQFrSk4OA / モンダイナイトリッパー！ / 名取さな\nhttps://youtu.be/QptGSJ06d74 / Aether Crest: Celestial / void (Mournfinale) × 水野健治`;
+    const songList = songRaw.trim().split('\n').map(line => {
+      const [url, title, artist] = line.split(' / ').map(s => s.trim());
+      return { url, title, artist };
+    });
+    let current = 0;
+    let player;
+    let playing = false;
+
+    function getYoutubeId(url) {
+      const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]{11})/);
+      return match ? match[1] : null;
+    }
+
+    function updateTitle() {
+      document.getElementById('music-title').textContent = songList[current].title || songList[current].url;
+      document.getElementById('music-artist').textContent = songList[current].artist || '';
+    }
+
+    function updatePlaylist() {
+      const ul = document.getElementById('music-playlist');
+      ul.innerHTML = '';
+      songList.forEach((song, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${song.title}</span><small style='opacity:0.7;'>${song.artist}</small>`;
+        if (i === current) li.classList.add('active');
+        li.onclick = () => { loadSong(i); };
+        ul.appendChild(li);
+      });
+    }
+
+    function loadSong(idx) {
+      current = idx;
+      updateTitle();
+      updatePlaylist();
+      const vid = getYoutubeId(songList[current].url);
+      if (player) {
+        player.loadVideoById(vid);
+        playing = true;
+        document.getElementById('play-btn').textContent = '⏸ Pause';
+      } else {
+        createPlayer(vid);
+      }
+    }
+
+    function createPlayer(vid) {
+      player = new YT.Player('music-yt', {
+        height: '0', width: '0', videoId: vid,
+        playerVars: { 'autoplay': 1, 'controls': 0 },
+        events: {
+          'onReady': () => {
+            playing = true;
+            document.getElementById('play-btn').textContent = '⏸ Pause';
+          },
+          'onStateChange': (e) => {
+            if (e.data === YT.PlayerState.ENDED) nextSong();
+          }
+        }
+      });
+    }
+
+    function playPause() {
+      if (!player) return;
+      if (playing) {
+        player.pauseVideo();
+        playing = false;
+        document.getElementById('play-btn').textContent = '▶️ Play';
+      } else {
+        player.playVideo();
+        playing = true;
+        document.getElementById('play-btn').textContent = '⏸ Pause';
+      }
+    }
+    function nextSong() {
+      loadSong((current + 1) % songList.length);
+    }
+    function prevSong() {
+      loadSong((current - 1 + songList.length) % songList.length);
+    }
+    document.getElementById('play-btn').onclick = playPause;
+    document.getElementById('next-btn').onclick = nextSong;
+    document.getElementById('prev-btn').onclick = prevSong;
+    window.onYouTubeIframeAPIReady = function() {
+      loadSong(current);
+    };
+    updateTitle();
+    updatePlaylist();
+  </script>
+</body>
+</html> 

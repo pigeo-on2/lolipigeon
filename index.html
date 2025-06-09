@@ -35,10 +35,9 @@
             </div>
             <div class="profile-desc">Rhythm Game Player & Developer</div>
             <div class="profile-social">
-                <a href="https://discord.com/users/pigeo_on2" title="Discord" target="_blank">💬</a>
+                <a id="discord-copy-btn" title="Discord" style="cursor:pointer;">💬</a>
                 <a href="https://twitter.com/pigeo_on2" title="Twitter" target="_blank">🕊️</a>
             </div>
-            <a href="minigames.html" class="minigame-btn">Minigames</a>
         </div>
         <div class="about-card card">
             <div class="card-title">About</div>
@@ -75,6 +74,152 @@
             </div>
         </div>
     </div>
+    <a href="minigames.html" class="minigame-float-btn">Minigames</a>
+    <div id="toast" style="display:none;position:fixed;right:2.2rem;bottom:2.2rem;z-index:9999;"></div>
+    <div id="star-slider-container" style="position:fixed;left:1.5rem;bottom:1.5rem;z-index:10;display:flex;align-items:center;gap:0.7em;background:rgba(30,34,60,0.55);backdrop-filter:blur(6px);border-radius:1em;padding:0.5em 1.1em 0.5em 1em;box-shadow:0 2px 12px #0002;">
+      <span style="font-size:1.1em;color:#a29bfe;">★</span>
+      <input id="star-slider" type="range" min="50" max="700" value="350" style="accent-color:#a29bfe;width:110px;vertical-align:middle;">
+      <span id="star-slider-value" style="font-size:1em;color:#fff;min-width:2.5em;text-align:right;">350</span>
+    </div>
+    <div id="mini-music-player" style="position:fixed;right:1.5rem;bottom:5.5rem;z-index:20;min-width:220px;max-width:320px;background:rgba(30,34,60,0.7);backdrop-filter:blur(6px);border-radius:1em;box-shadow:0 2px 12px #0002;padding:0.7em 1.2em 0.7em 1em;display:flex;flex-direction:column;align-items:flex-start;gap:0.3em;">
+      <div style="font-size:1em;font-weight:700;color:#a29bfe;" id="mini-music-title">Loading...</div>
+      <div style="font-size:0.95em;color:#fff;opacity:0.8;" id="mini-music-artist"></div>
+      <div id="mini-music-yt" style="display:none;"></div>
+      <div style="display:flex;gap:0.7em;margin-top:0.2em;">
+        <button id="mini-prev-btn" style="background:none;border:none;color:#a29bfe;font-size:1.2em;cursor:pointer;">⏮</button>
+        <button id="mini-play-btn" style="background:linear-gradient(90deg,#ff70a6 30%,#a29bfe 70%);color:#fff;border:none;border-radius:6px;padding:0.2em 0.9em;font-size:1em;font-weight:700;cursor:pointer;box-shadow:0 2px 8px #a29bfe33;">▶️</button>
+        <button id="mini-next-btn" style="background:none;border:none;color:#a29bfe;font-size:1.2em;cursor:pointer;">⏭</button>
+      </div>
+    </div>
+    <style>
+    #toast {
+      display: none;
+      position: fixed;
+      right: 2.2rem;
+      bottom: 2.2rem;
+      z-index: 9999;
+      background: #2d4732;
+      color: #fff;
+      padding: 0.7em 1.5em;
+      border-radius: 1em;
+      font-weight: 700;
+      box-shadow: 0 2px 12px #2ecc4044;
+      font-size: 1.1em;
+      transition: opacity 0.45s cubic-bezier(.4,0,.2,1), transform 0.45s cubic-bezier(.4,0,.2,1);
+      opacity: 0;
+      transform: translateY(30px);
+      pointer-events: none;
+      min-width: 180px;
+      text-align: center;
+    }
+    #toast.toast-show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #toast.toast-hide {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    </style>
     <script src="stars.js"></script>
+    <script>
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = '<span style="font-size:1.3em;vertical-align:middle;">✅</span> <span style="margin-left:0.5em;vertical-align:middle;">'+msg+'</span>';
+      toast.className = 'toast-show';
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.className = 'toast-show toast-hide';
+        setTimeout(() => { toast.style.display = 'none'; toast.className = ''; }, 500);
+      }, 1500);
+    }
+    document.getElementById('discord-copy-btn').onclick = function() {
+      navigator.clipboard.writeText('pigeo_on2').then(function() {
+        showToast('discord id copied!');
+      });
+    };
+    document.getElementById('star-slider').addEventListener('input', function(e) {
+      const val = +e.target.value;
+      window.setStarCount(val);
+      document.getElementById('star-slider-value').textContent = val;
+    });
+    // YouTube IFrame API loader
+    let miniTag = document.createElement('script');
+    miniTag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(miniTag);
+    // Parse songs.txt (hardcoded for now)
+    const miniSongRaw = `https://youtu.be/g5HQFrSk4OA / モンダイナイトリッパー！ / 名取さな\nhttps://youtu.be/QptGSJ06d74 / Aether Crest: Celestial / void (Mournfinale) × 水野健治`;
+    const miniSongList = miniSongRaw.trim().split('\n').map(line => {
+      const [url, title, artist] = line.split(' / ').map(s => s.trim());
+      return { url, title, artist };
+    });
+    let miniCurrent = 0;
+    let miniPlayer;
+    let miniPlaying = false;
+    function getMiniYoutubeId(url) {
+      const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]{11})/);
+      return match ? match[1] : null;
+    }
+    function updateMiniTitle() {
+      document.getElementById('mini-music-title').textContent = miniSongList[miniCurrent].title || miniSongList[miniCurrent].url;
+      document.getElementById('mini-music-artist').textContent = miniSongList[miniCurrent].artist || '';
+    }
+    function loadMiniSong(idx) {
+      miniCurrent = idx;
+      updateMiniTitle();
+      const vid = getMiniYoutubeId(miniSongList[miniCurrent].url);
+      if (miniPlayer) {
+        miniPlayer.loadVideoById(vid);
+        miniPlaying = true;
+        document.getElementById('mini-play-btn').textContent = '⏸';
+      } else {
+        createMiniPlayer(vid);
+      }
+    }
+    function createMiniPlayer(vid) {
+      miniPlayer = new YT.Player('mini-music-yt', {
+        height: '0', width: '0', videoId: vid,
+        playerVars: { 'autoplay': 1, 'controls': 0 },
+        events: {
+          'onReady': () => {
+            miniPlaying = true;
+            document.getElementById('mini-play-btn').textContent = '⏸';
+          },
+          'onStateChange': (e) => {
+            if (e.data === YT.PlayerState.ENDED) miniNextSong();
+          }
+        }
+      });
+    }
+    function miniPlayPause() {
+      if (!miniPlayer) return;
+      if (miniPlaying) {
+        miniPlayer.pauseVideo();
+        miniPlaying = false;
+        document.getElementById('mini-play-btn').textContent = '▶️';
+      } else {
+        miniPlayer.playVideo();
+        miniPlaying = true;
+        document.getElementById('mini-play-btn').textContent = '⏸';
+      }
+    }
+    function miniNextSong() {
+      loadMiniSong((miniCurrent + 1) % miniSongList.length);
+    }
+    function miniPrevSong() {
+      loadMiniSong((miniCurrent - 1 + miniSongList.length) % miniSongList.length);
+    }
+    document.getElementById('mini-play-btn').onclick = miniPlayPause;
+    document.getElementById('mini-next-btn').onclick = miniNextSong;
+    document.getElementById('mini-prev-btn').onclick = miniPrevSong;
+    window.onYouTubeIframeAPIReady = function() {
+      if (!window._mainMusicLoaded) {
+        window._mainMusicLoaded = true;
+        loadMiniSong(miniCurrent);
+      }
+    };
+    updateMiniTitle();
+    </script>
 </body>
 </html> 
