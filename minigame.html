@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catch the Star - Minigame</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #181c2f 0%, #2a225a 60%, #3a1c71 100%);
+      color: #fff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    #game-area {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      background: rgba(30,34,60,0.7);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: none;
+      cursor: pointer;
+      transition: filter 0.1s;
+      filter: drop-shadow(0 0 8px #fff8);
+      user-select: none;
+    }
+    .star:active {
+      filter: drop-shadow(0 0 16px #ff70a6);
+    }
+    .score {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 8px #23234a44;
+    }
+    .reset-btn, .back-btn {
+      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7em 1.5em;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0 0.5em;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #a29bfe33;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .reset-btn:hover, .back-btn:hover {
+      background: linear-gradient(90deg, #a29bfe 30%, #ff70a6 70%);
+      transform: scale(1.05);
+    }
+    .minigame-title {
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 1.2rem;
+      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="minigame-title">Catch the Star!</div>
+  <div class="score">Score: <span id="score">0</span></div>
+  <div id="game-area"></div>
+  <div>
+    <button class="reset-btn" onclick="resetGame()">Reset</button>
+    <button class="back-btn" onclick="window.location.href='index.html'">Back to Main</button>
+  </div>
+  <script>
+    const gameArea = document.getElementById('game-area');
+    const scoreEl = document.getElementById('score');
+    let score = 0;
+    let star = null;
+    let moveInterval = null;
+
+    function randomPos() {
+      const x = Math.random() * (gameArea.clientWidth - 40);
+      const y = Math.random() * (gameArea.clientHeight - 40);
+      return { x, y };
+    }
+
+    function createStar() {
+      if (star) star.remove();
+      star = document.createElement('div');
+      star.className = 'star';
+      star.innerHTML = '⭐';
+      const { x, y } = randomPos();
+      star.style.left = x + 'px';
+      star.style.top = y + 'px';
+      star.onclick = () => {
+        score++;
+        scoreEl.textContent = score;
+        moveStar();
+      };
+      gameArea.appendChild(star);
+    }
+
+    function moveStar() {
+      const { x, y } = randomPos();
+      star.style.left = x + 'px';
+      star.style.top = y + 'px';
+    }
+
+    function startMoving() {
+      if (moveInterval) clearInterval(moveInterval);
+      moveInterval = setInterval(() => {
+        moveStar();
+      }, 900);
+    }
+
+    function resetGame() {
+      score = 0;
+      scoreEl.textContent = score;
+      createStar();
+      startMoving();
+    }
+
+    // Start game
+    createStar();
+    startMoving();
+  </script>
+</body>
+</html> 

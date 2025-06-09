@@ -598,4 +598,26 @@ section {
 
 .chunithm-link:hover {
     background: rgba(255,112,166,0.08);
+}
+
+.minigame-btn {
+    display: inline-block;
+    margin-top: 1.3rem;
+    background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
+    color: #fff;
+    font-size: 1.18rem;
+    font-weight: 800;
+    padding: 0.7em 2.2em;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 2px 12px #a29bfe33;
+    transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+    letter-spacing: 0.5px;
+}
+
+.minigame-btn:hover {
+    background: linear-gradient(90deg, #a29bfe 30%, #ff70a6 70%);
+    color: #fff;
+    transform: scale(1.06);
+    box-shadow: 0 4px 24px #ff70a6aa;
 } 
