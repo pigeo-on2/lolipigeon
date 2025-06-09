@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sudoku Minigame</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #181c2f 0%, #2a225a 60%, #3a1c71 100%);
+      color: #fff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .sudoku-title {
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 1.2rem;
+      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+    }
+    .sudoku-board {
+      display: grid;
+      grid-template-columns: repeat(9, 2.2em);
+      grid-template-rows: repeat(9, 2.2em);
+      gap: 0.2em;
+      background: rgba(30,34,60,0.7);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+      padding: 1.2em;
+      margin-bottom: 1.2em;
+    }
+    .sudoku-cell {
+      width: 2.2em;
+      height: 2.2em;
+      text-align: center;
+      font-size: 1.3em;
+      border: none;
+      border-radius: 6px;
+      background: #23234a;
+      color: #fff;
+      outline: none;
+      box-shadow: 0 1px 4px #0002;
+      transition: background 0.15s;
+    }
+    .sudoku-cell:focus {
+      background: #a29bfe44;
+    }
+    .sudoku-cell[readonly] {
+      background: #3a1c71;
+      color: #ff70a6;
+      font-weight: 700;
+    }
+    .sudoku-btn, .back-btn {
+      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7em 1.5em;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0 0.5em;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #a29bfe33;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .sudoku-btn:hover, .back-btn:hover {
+      background: linear-gradient(90deg, #a29bfe 30%, #ff70a6 70%);
+      transform: scale(1.05);
+    }
+    .sudoku-message {
+      margin-top: 1em;
+      font-size: 1.1em;
+      font-weight: 700;
+      min-height: 1.5em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="sudoku-title">Sudoku</div>
+  <div class="sudoku-board" id="sudoku-board"></div>
+  <div>
+    <button class="sudoku-btn" onclick="checkSudoku()">Check</button>
+    <button class="back-btn" onclick="window.location.href='minigames.html'">Back to Lobby</button>
+  </div>
+  <div class="sudoku-message" id="sudoku-message"></div>
+  <script>
+    // Simple Sudoku puzzle (0 = empty)
+    const puzzle = [
+      [5,3,0,0,7,0,0,0,0],
+      [6,0,0,1,9,5,0,0,0],
+      [0,9,8,0,0,0,0,6,0],
+      [8,0,0,0,6,0,0,0,3],
+      [4,0,0,8,0,3,0,0,1],
+      [7,0,0,0,2,0,0,0,6],
+      [0,6,0,0,0,0,2,8,0],
+      [0,0,0,4,1,9,0,0,5],
+      [0,0,0,0,8,0,0,7,9]
+    ];
+    // Solution for checking
+    const solution = [
+      [5,3,4,6,7,8,9,1,2],
+      [6,7,2,1,9,5,3,4,8],
+      [1,9,8,3,4,2,5,6,7],
+      [8,5,9,7,6,1,4,2,3],
+      [4,2,6,8,5,3,7,9,1],
+      [7,1,3,9,2,4,8,5,6],
+      [9,6,1,5,3,7,2,8,4],
+      [2,8,7,4,1,9,6,3,5],
+      [3,4,5,2,8,6,1,7,9]
+    ];
+    const board = document.getElementById('sudoku-board');
+    const message = document.getElementById('sudoku-message');
+    let cells = [];
+    // Render board
+    for (let r = 0; r < 9; r++) {
+      cells[r] = [];
+      for (let c = 0; c < 9; c++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.maxLength = 1;
+        input.className = 'sudoku-cell';
+        if (puzzle[r][c] !== 0) {
+          input.value = puzzle[r][c];
+          input.readOnly = true;
+        }
+        input.oninput = () => {
+          input.value = input.value.replace(/[^1-9]/g, '');
+        };
+        board.appendChild(input);
+        cells[r][c] = input;
+      }
+    }
+    function checkSudoku() {
+      let correct = true;
+      for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+          const val = parseInt(cells[r][c].value, 10);
+          if (val !== solution[r][c]) {
+            correct = false;
+            cells[r][c].style.background = '#ff70a633';
+          } else {
+            if (!cells[r][c].readOnly) cells[r][c].style.background = '#23234a';
+          }
+        }
+      }
+      if (correct) {
+        message.textContent = '🎉 Correct! You solved the puzzle!';
+        message.style.color = '#ff70a6';
+      } else {
+        message.textContent = 'Some cells are incorrect. Try again!';
+        message.style.color = '#fff';
+      }
+    }
+  </script>
+</body>
+</html> 
