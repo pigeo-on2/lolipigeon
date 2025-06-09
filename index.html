@@ -93,7 +93,7 @@
       </div>
       <div style="display:flex;gap:0.7em;margin-top:0.2em;align-items:center;flex-wrap:wrap;">
         <button id="mini-prev-btn" style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);color:#a29bfe;font-size:1.1em;cursor:pointer;border-radius:8px;padding:0.4em 0.8em;transition:all 0.3s ease;">⏮</button>
-        <button id="mini-play-btn" style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);color:#a29bfe;font-size:1.1em;cursor:pointer;border-radius:8px;padding:0.4em 0.8em;transition:all 0.3s ease;">▶■</button>
+        <button id="mini-play-btn" style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);color:#a29bfe;font-size:1.1em;cursor:pointer;border-radius:8px;padding:0.4em 0.8em;transition:all 0.3s ease;">▶</button>
         <button id="mini-next-btn" style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);color:#a29bfe;font-size:1.1em;cursor:pointer;border-radius:8px;padding:0.4em 0.8em;transition:all 0.3s ease;">⏭</button>
         <div style="display:flex;align-items:center;gap:0.5em;padding:0.4em 0.8em;background:rgba(162,155,254,0.1);border-radius:8px;border:1px solid rgba(162,155,254,0.2);">
           <span style="color:#a29bfe;font-size:0.9em;">🔊</span>
@@ -214,7 +214,8 @@
         events: {
           'onReady': () => {
             miniPlaying = true;
-            document.getElementById('mini-play-btn').textContent = '⏸';
+            document.getElementById('mini-play-btn').textContent = '■';
+            miniPlayer.mute();
             miniPlayer.setVolume(document.getElementById('mini-volume-slider').value);
             startMiniProgressUpdate();
           },
@@ -229,12 +230,12 @@
       if (miniPlaying) {
         miniPlayer.pauseVideo();
         miniPlaying = false;
-        document.getElementById('mini-play-btn').textContent = '▶■';
+        document.getElementById('mini-play-btn').textContent = '▶';
         clearInterval(miniProgressInterval);
       } else {
         miniPlayer.playVideo();
         miniPlaying = true;
-        document.getElementById('mini-play-btn').textContent = '⏸';
+        document.getElementById('mini-play-btn').textContent = '■';
         startMiniProgressUpdate();
       }
     }
@@ -245,7 +246,7 @@
       if (miniPlayer) {
         miniPlayer.loadVideoById(vid);
         miniPlaying = true;
-        document.getElementById('mini-play-btn').textContent = '⏸';
+        document.getElementById('mini-play-btn').textContent = '■';
         startMiniProgressUpdate();
       } else {
         createMiniPlayer(vid);
@@ -257,7 +258,10 @@
     function miniPrevSong() {
       loadMiniSong((miniCurrent - 1 + miniSongList.length) % miniSongList.length);
     }
-    document.getElementById('mini-play-btn').onclick = miniPlayPause;
+    document.getElementById('mini-play-btn').onclick = function() {
+      miniPlayPause();
+      if (miniPlayer && miniPlayer.isMuted()) miniPlayer.unMute();
+    };
     document.getElementById('mini-next-btn').onclick = miniNextSong;
     document.getElementById('mini-prev-btn').onclick = miniPrevSong;
     document.getElementById('mini-progress-container').addEventListener('click', miniSeekTo);
@@ -271,6 +275,7 @@
     document.getElementById('mini-volume-slider').addEventListener('input', function(e) {
       if (miniPlayer) {
         miniPlayer.setVolume(e.target.value);
+        if (miniPlayer.isMuted()) miniPlayer.unMute();
       }
     });
     </script>
