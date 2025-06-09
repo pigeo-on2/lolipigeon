@@ -1,8 +1,15 @@
 :root {
     --primary-color: #ff70a6;
-    --bg-color: #f8f9fa;
-    --text-color: #2d3436;
+    --bg-color: #1a1a2e;
+    --text-color: #ffffff;
     --accent-color: #a29bfe;
+    --card-bg: #16213e;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    --discord-color: #5865F2;
+    --twitter-color: #1DA1F2;
+    --python-color: #306998;
+    --cpp-color: #00599C;
+    --csharp-color: #68217A;
 }
 
 * {
@@ -17,37 +24,281 @@ body {
     color: var(--text-color);
     line-height: 1.6;
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 2rem;
+}
+
+.header {
     text-align: center;
+    margin-bottom: 4rem;
     animation: fadeIn 1s ease-out;
 }
 
 h1 {
     font-size: 3.5rem;
     color: var(--primary-color);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     font-weight: 800;
     letter-spacing: -0.02em;
-    transform: translateY(0);
+    text-shadow: 0 0 10px rgba(255, 112, 166, 0.3);
+}
+
+h2 {
+    font-size: 2rem;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.tagline {
+    font-size: 1.25rem;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+section {
+    margin-bottom: 5rem;
+}
+
+/* Skills Section */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.skill-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skill-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+}
+
+.skill-card:nth-child(1):hover {
+    border-color: var(--python-color);
+}
+
+.skill-card:nth-child(2):hover {
+    border-color: var(--cpp-color);
+}
+
+.skill-card:nth-child(3):hover {
+    border-color: var(--csharp-color);
+}
+
+.skill-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* Interests Section */
+.interests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.interest-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.interest-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+}
+
+.interest-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* Projects Section */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.project-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
     transition: transform 0.3s ease;
 }
 
-h1:hover {
+.project-card:hover {
     transform: translateY(-5px);
 }
 
-p {
+.project-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.project-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.project-card:hover .project-image img {
+    transform: scale(1.05);
+}
+
+.project-card h3 {
+    padding: 1.5rem 1.5rem 0.5rem;
     font-size: 1.25rem;
-    margin: 1rem 0;
+}
+
+.project-card p {
+    padding: 0 1.5rem 1.5rem;
     color: var(--text-color);
-    opacity: 0.9;
+    opacity: 0.8;
+}
+
+.project-links {
+    padding: 0 1.5rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.project-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.project-link:hover {
+    color: var(--accent-color);
+}
+
+/* Games Section */
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.game-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+}
+
+.game-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.game-detail {
+    margin-top: 1rem;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+/* Social Section */
+.social-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.social-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-color);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-card:hover {
+    transform: translateY(-5px);
+}
+
+.social-card.discord:hover {
+    background: var(--discord-color);
+}
+
+.social-card.twitter:hover {
+    background: var(--twitter-color);
+}
+
+.social-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* Contact Section */
+.contact-section {
+    text-align: center;
+}
+
+.contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.contact-link {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.contact-link:hover {
+    background: var(--primary-color);
+    color: var(--text-color);
+    transform: translateY(-2px);
 }
 
 @keyframes fadeIn {
@@ -70,7 +321,13 @@ p {
         font-size: 2.5rem;
     }
     
-    p {
-        font-size: 1.1rem;
+    h2 {
+        font-size: 1.75rem;
+    }
+    
+    .contact-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
     }
 } 
