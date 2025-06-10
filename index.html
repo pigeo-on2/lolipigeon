@@ -25,6 +25,121 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+    .music-player-container {
+      position: fixed;
+      right: 2.2rem;
+      bottom: 6.5rem;
+      z-index: 1000;
+      width: 320px;
+      max-width: 90vw;
+      padding: 1.2rem;
+      background: rgba(20, 24, 40, 0.92);
+      backdrop-filter: blur(10px);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1.5px solid rgba(162,155,254,0.13);
+    }
+    .music-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: #a29bfe;
+      text-shadow: 0 0 20px rgba(162, 155, 254, 0.3);
+    }
+    .music-artist {
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: #fff;
+      opacity: 0.8;
+    }
+    .music-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .music-btn {
+      background: rgba(162, 155, 254, 0.1);
+      color: #a29bfe;
+      border: 1px solid rgba(162, 155, 254, 0.2);
+      border-radius: 12px;
+      padding: 0.8em 1.4em;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .music-btn:hover {
+      background: rgba(162, 155, 254, 0.2);
+      transform: translateY(-2px);
+    }
+    .music-btn:active {
+      transform: translateY(0);
+    }
+    .volume-control {
+      display: flex;
+      align-items: center;
+      gap: 0.8em;
+      margin-left: 1em;
+      padding: 0.5em 1em;
+      background: rgba(162, 155, 254, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(162, 155, 254, 0.2);
+    }
+    .volume-control span {
+      color: #a29bfe;
+    }
+    .volume-control input[type="range"] {
+      width: 100px;
+      accent-color: #a29bfe;
+      background: transparent;
+    }
+    .progress-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(162, 155, 254, 0.1);
+      border-radius: 2px;
+      margin: 1.5rem 0;
+      cursor: pointer;
+      position: relative;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #a29bfe;
+      border-radius: 2px;
+      width: 0;
+      transition: width 0.1s linear;
+    }
+    .time-display {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 0.9em;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 0.5em;
+    }
+    .music-yt {
+      display: none;
+    }
+    @media (max-width: 600px) {
+      .music-player-container {
+        right: 0.5rem !important;
+        bottom: 0.5rem !important;
+        width: 98vw !important;
+        max-width: 98vw !important;
+        padding: 0.7rem 0.5rem !important;
+      }
+    }
+    </style>
 </head>
 <body>
     <div class="main-grid">
@@ -78,60 +193,31 @@
     <div id="toast" style="display:none;position:fixed;right:2.2rem;bottom:2.2rem;z-index:9999;"></div>
     <div id="star-slider-container" style="position:fixed;left:1.5rem;bottom:1.5rem;z-index:10;display:flex;align-items:center;gap:0.7em;background:rgba(30,34,60,0.55);backdrop-filter:blur(6px);border-radius:1em;padding:0.5em 1.1em 0.5em 1em;box-shadow:0 2px 12px #0002;">
       <span style="font-size:1.1em;color:#a29bfe;">★</span>
-      <input id="star-slider" type="range" min="50" max="700" value="350" style="accent-color:#a29bfe;width:110px;vertical-align:middle;">
-      <span id="star-slider-value" style="font-size:1em;color:#fff;min-width:2.5em;text-align:right;">350</span>
+      <input id="star-slider" type="range" min="50" max="2000" value="500" style="accent-color:#a29bfe;width:110px;vertical-align:middle;">
+      <span id="star-slider-value" style="font-size:1em;color:#fff;min-width:2.5em;text-align:right;">500</span>
     </div>
-    <div id="mini-music-player" style="position:fixed;right:1.5rem;bottom:5.5rem;z-index:20;min-width:220px;max-width:320px;background:rgba(20,24,40,0.8);backdrop-filter:blur(12px);border-radius:1em;box-shadow:0 8px 32px rgba(0,0,0,0.2);padding:1.2em;display:flex;flex-direction:column;align-items:flex-start;gap:0.5em;border:1px solid rgba(255,255,255,0.1);">
-      <div style="font-size:1.1em;font-weight:700;color:#a29bfe;text-shadow:0 0 20px rgba(162,155,254,0.3);" id="mini-music-title">Loading...</div>
-      <div style="font-size:0.95em;color:#fff;opacity:0.8;" id="mini-music-artist"></div>
-      <div style="width:100%;height:3px;background:rgba(162,155,254,0.1);border-radius:2px;margin:0.5em 0;cursor:pointer;position:relative;" id="mini-progress-container">
-        <div style="height:100%;background:#a29bfe;border-radius:2px;width:0;transition:width 0.1s linear;" id="mini-progress-bar"></div>
+    <div class="music-player-container" id="music-player-container">
+      <div class="playlist-popup" id="playlist-popup" style="display:none;position:absolute;left:50%;top:-10px;transform:translate(-50%,-100%);min-width:260px;max-width:95vw;background:rgba(30,34,60,0.97);border-radius:14px;box-shadow:0 4px 24px 0 rgba(31,38,135,0.13);padding:0.7em 0.5em;z-index:2000;border:1.5px solid rgba(162,155,254,0.13);"></div>
+      <div class="music-title" id="music-title">Loading...</div>
+      <div class="music-artist" id="music-artist"></div>
+      <div class="progress-container" id="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
       </div>
-      <div style="display:flex;justify-content:space-between;width:100%;font-size:0.8em;color:rgba(255,255,255,0.6);">
-        <span id="mini-current-time">0:00</span>
-        <span id="mini-total-time">0:00</span>
+      <div class="time-display">
+        <span id="current-time">0:00</span>
+        <span id="total-time">0:00</span>
       </div>
-      <div style="display:flex;gap:0.7em;margin-top:0.2em;align-items:center;flex-wrap:wrap;">
-        <button id="mini-prev-btn" style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);color:#a29bfe;font-size:1.1em;cursor:pointer;border-radius:8px;padding:0.4em 0.8em;transition:all 0.3s ease;">⏮</button>
-        <button id="mini-play-btn" style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);color:#a29bfe;font-size:1.1em;cursor:pointer;border-radius:8px;padding:0.4em 0.8em;transition:all 0.3s ease;">▶</button>
-        <button id="mini-next-btn" style="background:rgba(162,155,254,0.1);border:1px solid rgba(162,155,254,0.2);color:#a29bfe;font-size:1.1em;cursor:pointer;border-radius:8px;padding:0.4em 0.8em;transition:all 0.3s ease;">⏭</button>
-        <div style="display:flex;align-items:center;gap:0.5em;padding:0.4em 0.8em;background:rgba(162,155,254,0.1);border-radius:8px;border:1px solid rgba(162,155,254,0.2);">
-          <span style="color:#a29bfe;font-size:0.9em;">🔊</span>
-          <input type="range" id="mini-volume-slider" min="0" max="100" value="100" style="accent-color:#a29bfe;width:80px;vertical-align:middle;">
+      <div class="music-controls">
+        <button class="music-btn" id="prev-btn" disabled>⏮</button>
+        <button class="music-btn" id="play-btn" disabled>▶</button>
+        <button class="music-btn" id="next-btn" disabled>⏭</button>
+        <div class="volume-control">
+          <span>🔊</span>
+          <input type="range" id="volume-slider" min="0" max="100" value="100">
         </div>
       </div>
+      <div class="music-yt" id="music-yt"></div>
     </div>
-    <style>
-    #toast {
-      display: none;
-      position: fixed;
-      right: 2.2rem;
-      bottom: 2.2rem;
-      z-index: 9999;
-      background: #2d4732;
-      color: #fff;
-      padding: 0.7em 1.5em;
-      border-radius: 1em;
-      font-weight: 700;
-      box-shadow: 0 2px 12px #2ecc4044;
-      font-size: 1.1em;
-      transition: opacity 0.45s cubic-bezier(.4,0,.2,1), transform 0.45s cubic-bezier(.4,0,.2,1);
-      opacity: 0;
-      transform: translateY(30px);
-      pointer-events: none;
-      min-width: 180px;
-      text-align: center;
-    }
-    #toast.toast-show {
-      display: block;
-      opacity: 1;
-      transform: translateY(0);
-    }
-    #toast.toast-hide {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    </style>
     <script src="stars.js"></script>
     <script>
     function showToast(msg) {
@@ -155,128 +241,199 @@
       document.getElementById('star-slider-value').textContent = val;
     });
     // YouTube IFrame API loader
-    let miniTag = document.createElement('script');
-    miniTag.src = "https://www.youtube.com/iframe_api";
-    document.body.appendChild(miniTag);
-    // Parse songs.txt (hardcoded for now)
-    const miniSongRaw = `https://youtu.be/g5HQFrSk4OA / モンダイナイトリッパー！ / 名取さな\nhttps://youtu.be/QptGSJ06d74 / Aether Crest: Celestial / void (Mournfinale) × 水野健治`;
-    const miniSongList = miniSongRaw.trim().split('\n').map(line => {
-      const [url, title, artist] = line.split(' / ').map(s => s.trim());
-      return { url, title, artist };
-    });
-    let miniCurrent = 0;
-    let miniPlayer;
-    let miniPlaying = false;
-    let miniProgressInterval;
+    let tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
 
-    function formatMiniTime(seconds) {
+    const songList = [
+      { url: 'https://youtu.be/g5HQFrSk4OA', title: 'モンダイナイトリッパー！', artist: '名取さな' },
+      { url: 'https://youtu.be/QptGSJ06d74', title: 'Aether Crest: Celestial', artist: 'void (Mournfinale) × 水野健治' }
+    ];
+
+    let current = 0;
+    let player;
+    let playing = false;
+    let progressInterval;
+
+    function formatTime(seconds) {
       const minutes = Math.floor(seconds / 60);
       seconds = Math.floor(seconds % 60);
       return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    function updateMiniProgress() {
-      if (!miniPlayer) return;
-      const currentTime = miniPlayer.getCurrentTime();
-      const duration = miniPlayer.getDuration();
+    function updateProgress() {
+      if (!player) return;
+      const currentTime = player.getCurrentTime();
+      const duration = player.getDuration();
       const progress = (currentTime / duration) * 100;
-      document.getElementById('mini-progress-bar').style.width = `${progress}%`;
-      document.getElementById('mini-current-time').textContent = formatMiniTime(currentTime);
-      document.getElementById('mini-total-time').textContent = formatMiniTime(duration);
+      document.getElementById('progress-bar').style.width = `${progress}%`;
+      document.getElementById('current-time').textContent = formatTime(currentTime);
+      document.getElementById('total-time').textContent = formatTime(duration);
     }
 
-    function startMiniProgressUpdate() {
-      if (miniProgressInterval) clearInterval(miniProgressInterval);
-      miniProgressInterval = setInterval(updateMiniProgress, 1000);
-    }
-
-    function miniSeekTo(e) {
-      if (!miniPlayer) return;
-      const rect = e.target.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const percentage = x / rect.width;
-      const duration = miniPlayer.getDuration();
-      miniPlayer.seekTo(duration * percentage);
-    }
-
-    function getMiniYoutubeId(url) {
+    function getYoutubeId(url) {
       const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]{11})/);
       return match ? match[1] : null;
     }
-    function updateMiniTitle() {
-      document.getElementById('mini-music-title').textContent = miniSongList[miniCurrent].title || miniSongList[miniCurrent].url;
-      document.getElementById('mini-music-artist').textContent = miniSongList[miniCurrent].artist || '';
+
+    function updateTitle() {
+      document.getElementById('music-title').textContent = songList[current].title;
+      document.getElementById('music-artist').textContent = songList[current].artist;
     }
-    function createMiniPlayer(vid) {
-      miniPlayer = new YT.Player('mini-music-yt', {
-        height: '0', width: '0', videoId: vid,
+
+    function loadSong(idx) {
+      current = idx;
+      updateTitle();
+      const vid = getYoutubeId(songList[current].url);
+      if (player) {
+        player.loadVideoById(vid);
+        playing = true;
+        document.getElementById('play-btn').textContent = '■';
+        startProgressUpdate();
+      } else {
+        createPlayer(vid);
+      }
+    }
+
+    function createPlayer(vid) {
+      player = new YT.Player('music-yt', {
+        height: '0',
+        width: '0',
+        videoId: vid,
         playerVars: { 'autoplay': 1, 'controls': 0 },
         events: {
           'onReady': () => {
-            miniPlaying = true;
-            document.getElementById('mini-play-btn').textContent = '■';
-            miniPlayer.mute();
-            miniPlayer.setVolume(document.getElementById('mini-volume-slider').value);
-            startMiniProgressUpdate();
+            playing = true;
+            document.getElementById('play-btn').textContent = '■';
+            player.mute();
+            player.setVolume(document.getElementById('volume-slider').value);
+            startProgressUpdate();
+            enableControls();
           },
           'onStateChange': (e) => {
-            if (e.data === YT.PlayerState.ENDED) miniNextSong();
+            if (e.data === YT.PlayerState.ENDED) nextSong();
           }
         }
       });
     }
-    function miniPlayPause() {
-      if (!miniPlayer) return;
-      if (miniPlaying) {
-        miniPlayer.pauseVideo();
-        miniPlaying = false;
-        document.getElementById('mini-play-btn').textContent = '▶';
-        clearInterval(miniProgressInterval);
+
+    function startProgressUpdate() {
+      if (progressInterval) clearInterval(progressInterval);
+      progressInterval = setInterval(updateProgress, 1000);
+    }
+
+    function playPause() {
+      if (!player) return;
+      if (playing) {
+        player.pauseVideo();
+        playing = false;
+        document.getElementById('play-btn').textContent = '▶';
+        clearInterval(progressInterval);
       } else {
-        miniPlayer.playVideo();
-        miniPlaying = true;
-        document.getElementById('mini-play-btn').textContent = '■';
-        startMiniProgressUpdate();
+        player.playVideo();
+        playing = true;
+        document.getElementById('play-btn').textContent = '■';
+        startProgressUpdate();
       }
     }
-    function loadMiniSong(idx) {
-      miniCurrent = idx;
-      updateMiniTitle();
-      const vid = getMiniYoutubeId(miniSongList[miniCurrent].url);
-      if (miniPlayer) {
-        miniPlayer.loadVideoById(vid);
-        miniPlaying = true;
-        document.getElementById('mini-play-btn').textContent = '■';
-        startMiniProgressUpdate();
-      } else {
-        createMiniPlayer(vid);
+
+    function nextSong() {
+      loadSong((current + 1) % songList.length);
+    }
+
+    function prevSong() {
+      loadSong((current - 1 + songList.length) % songList.length);
+    }
+
+    function seekTo(e) {
+      if (!player) return;
+      const rect = e.target.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = x / rect.width;
+      const duration = player.getDuration();
+      player.seekTo(duration * percentage);
+    }
+
+    function enableControls() {
+      document.getElementById('play-btn').disabled = false;
+      document.getElementById('next-btn').disabled = false;
+      document.getElementById('prev-btn').disabled = false;
+    }
+
+    function controlGuard(fn) {
+      return function() {
+        if (document.getElementById('play-btn').disabled) {
+          alert('플레이어가 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+          return;
+        }
+        fn.apply(this, arguments);
       }
     }
-    function miniNextSong() {
-      loadMiniSong((miniCurrent + 1) % miniSongList.length);
-    }
-    function miniPrevSong() {
-      loadMiniSong((miniCurrent - 1 + miniSongList.length) % miniSongList.length);
-    }
-    document.getElementById('mini-play-btn').onclick = function() {
-      miniPlayPause();
-      if (miniPlayer && miniPlayer.isMuted()) miniPlayer.unMute();
-    };
-    document.getElementById('mini-next-btn').onclick = miniNextSong;
-    document.getElementById('mini-prev-btn').onclick = miniPrevSong;
-    document.getElementById('mini-progress-container').addEventListener('click', miniSeekTo);
+
+    document.getElementById('play-btn').onclick = controlGuard(function() {
+      if (player) {
+        playPause();
+        if (player.isMuted()) player.unMute();
+      } else {
+        alert('플레이어가 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      }
+    });
+
+    document.getElementById('next-btn').onclick = controlGuard(nextSong);
+    document.getElementById('prev-btn').onclick = controlGuard(prevSong);
+
+    document.getElementById('volume-slider').addEventListener('input', function(e) {
+      if (player) {
+        player.setVolume(e.target.value);
+        if (player.isMuted()) player.unMute();
+      }
+    });
+
+    document.getElementById('progress-container').addEventListener('click', seekTo);
+
     window.onYouTubeIframeAPIReady = function() {
-      if (!window._mainMusicLoaded) {
-        window._mainMusicLoaded = true;
-        loadMiniSong(miniCurrent);
-      }
+      loadSong(current);
     };
-    updateMiniTitle();
-    document.getElementById('mini-volume-slider').addEventListener('input', function(e) {
-      if (miniPlayer) {
-        miniPlayer.setVolume(e.target.value);
-        if (miniPlayer.isMuted()) miniPlayer.unMute();
-      }
+
+    updateTitle();
+
+    function renderPlaylistPopup() {
+      const ul = document.createElement('ul');
+      ul.style.listStyle = 'none';
+      ul.style.margin = '0';
+      ul.style.padding = '0';
+      ul.style.maxHeight = '180px';
+      ul.style.overflowY = 'auto';
+      
+      songList.forEach((song, i) => {
+        const li = document.createElement('li');
+        li.style.padding = '0.7em 1em';
+        li.style.borderRadius = '8px';
+        li.style.cursor = 'pointer';
+        li.style.transition = 'background 0.15s, color 0.15s';
+        li.style.marginBottom = '0.2em';
+        li.style.display = 'flex';
+        li.style.flexDirection = 'column';
+        li.style.alignItems = 'flex-start';
+        li.style.background = i === current ? 'rgba(162,155,254,0.13)' : 'none';
+        li.style.color = i === current ? '#a29bfe' : '#fff';
+        li.innerHTML = `<span style='font-weight:700;'>${song.title}</span><small style='opacity:0.7;'>${song.artist}</small>`;
+        li.onclick = () => { loadSong(i); document.getElementById('playlist-popup').style.display = 'none'; };
+        ul.appendChild(li);
+      });
+
+      const popup = document.getElementById('playlist-popup');
+      popup.innerHTML = '';
+      popup.appendChild(ul);
+    }
+
+    const playerContainer = document.getElementById('music-player-container');
+    playerContainer.addEventListener('mouseenter', () => {
+      renderPlaylistPopup();
+      document.getElementById('playlist-popup').style.display = 'block';
+    });
+    playerContainer.addEventListener('mouseleave', () => {
+      document.getElementById('playlist-popup').style.display = 'none';
     });
     </script>
 </body>

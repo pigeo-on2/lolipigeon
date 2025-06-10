@@ -1,5 +1,5 @@
 // Animated starfield background
-let STAR_COUNT = 350;
+let STAR_COUNT = 500;
 const STAR_COLORS = ['#fff', '#b3b8ff', '#a29bfe', '#ffe6fa', '#c7d2fe'];
 const STAR_SIZE = [0.7, 1.2, 1.7];
 const STAR_SPEED = [0.02, 0.04, 0.07];
