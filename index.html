@@ -224,7 +224,10 @@
       const toast = document.getElementById('toast');
       toast.innerHTML = '<span style="font-size:1.3em;vertical-align:middle;">✅</span> <span style="margin-left:0.5em;vertical-align:middle;">'+msg+'</span>';
       toast.style.display = 'block';
-      toast.className = 'toast toast-show';
+      toast.className = 'toast';
+      requestAnimationFrame(() => {
+        toast.className = 'toast toast-show';
+      });
       setTimeout(() => {
         toast.className = 'toast toast-show toast-hide';
         setTimeout(() => { toast.style.display = 'none'; toast.className = 'toast'; }, 400);
