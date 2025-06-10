@@ -36,6 +36,7 @@
       box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
       padding: 1.2em;
       margin-bottom: 1.2em;
+      position: relative;
     }
     .sudoku-cell {
       width: 2.2em;
@@ -58,7 +59,13 @@
       color: #ff70a6;
       font-weight: 700;
     }
-    .sudoku-btn, .back-btn {
+    .sudoku-cell.correct {
+      background: #4CAF50;
+    }
+    .sudoku-cell.wrong {
+      background: #ff70a633;
+    }
+    .sudoku-btn, .back-btn, .restart-btn {
       background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
       color: #fff;
       border: none;
@@ -71,7 +78,7 @@
       box-shadow: 0 2px 8px #a29bfe33;
       transition: background 0.2s, transform 0.2s;
     }
-    .sudoku-btn:hover, .back-btn:hover {
+    .sudoku-btn:hover, .back-btn:hover, .restart-btn:hover {
       background: linear-gradient(90deg, #a29bfe 30%, #ff70a6 70%);
       transform: scale(1.05);
     }
@@ -82,84 +89,176 @@
       min-height: 1.5em;
       text-align: center;
     }
+    .lives {
+      margin-bottom: 1em;
+      font-size: 1.2em;
+      font-weight: 700;
+    }
+    .lives span {
+      color: #ff70a6;
+      margin: 0 0.2em;
+    }
+    /* 3x3 grid lines */
+    .sudoku-cell:nth-child(3n) {
+      border-right: 2px solid #ff70a6;
+    }
+    .sudoku-cell:nth-child(9n) {
+      border-right: none;
+    }
+    .sudoku-cell:nth-child(n+19):nth-child(-n+27),
+    .sudoku-cell:nth-child(n+46):nth-child(-n+54) {
+      border-bottom: 2px solid #ff70a6;
+    }
   </style>
 </head>
 <body>
   <div class="sudoku-title">Sudoku</div>
+  <div class="lives">Lives: <span id="lives">❤️❤️❤️</span></div>
   <div class="sudoku-board" id="sudoku-board"></div>
   <div>
     <button class="sudoku-btn" onclick="checkSudoku()">Check</button>
+    <button class="restart-btn" onclick="restartGame()">Restart</button>
     <button class="back-btn" onclick="window.location.href='minigames.html'">Back to Lobby</button>
   </div>
   <div class="sudoku-message" id="sudoku-message"></div>
   <script>
-    // Simple Sudoku puzzle (0 = empty)
-    const puzzle = [
-      [5,3,0,0,7,0,0,0,0],
-      [6,0,0,1,9,5,0,0,0],
-      [0,9,8,0,0,0,0,6,0],
-      [8,0,0,0,6,0,0,0,3],
-      [4,0,0,8,0,3,0,0,1],
-      [7,0,0,0,2,0,0,0,6],
-      [0,6,0,0,0,0,2,8,0],
-      [0,0,0,4,1,9,0,0,5],
-      [0,0,0,0,8,0,0,7,9]
-    ];
-    // Solution for checking
-    const solution = [
-      [5,3,4,6,7,8,9,1,2],
-      [6,7,2,1,9,5,3,4,8],
-      [1,9,8,3,4,2,5,6,7],
-      [8,5,9,7,6,1,4,2,3],
-      [4,2,6,8,5,3,7,9,1],
-      [7,1,3,9,2,4,8,5,6],
-      [9,6,1,5,3,7,2,8,4],
-      [2,8,7,4,1,9,6,3,5],
-      [3,4,5,2,8,6,1,7,9]
-    ];
+    let lives = 3;
+    let puzzle = [];
+    let solution = [];
+    let cells = [];
+    let gameOver = false;
     const board = document.getElementById('sudoku-board');
     const message = document.getElementById('sudoku-message');
-    let cells = [];
-    // Render board
-    for (let r = 0; r < 9; r++) {
-      cells[r] = [];
-      for (let c = 0; c < 9; c++) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.maxLength = 1;
-        input.className = 'sudoku-cell';
-        if (puzzle[r][c] !== 0) {
-          input.value = puzzle[r][c];
-          input.readOnly = true;
-        }
-        input.oninput = () => {
-          input.value = input.value.replace(/[^1-9]/g, '');
-        };
-        board.appendChild(input);
-        cells[r][c] = input;
+    const livesDisplay = document.getElementById('lives');
+
+    // Function to generate a random Sudoku puzzle
+    async function generatePuzzle() {
+      try {
+        const response = await fetch('https://sudoku-api.vercel.app/api/dosuku');
+        const data = await response.json();
+        puzzle = data.newboard.grids[0].value;
+        solution = data.newboard.grids[0].solution;
+        renderBoard();
+      } catch (error) {
+        console.error('Error fetching puzzle:', error);
+        // Fallback to a default puzzle if API fails
+        puzzle = [
+          [5,3,0,0,7,0,0,0,0],
+          [6,0,0,1,9,5,0,0,0],
+          [0,9,8,0,0,0,0,6,0],
+          [8,0,0,0,6,0,0,0,3],
+          [4,0,0,8,0,3,0,0,1],
+          [7,0,0,0,2,0,0,0,6],
+          [0,6,0,0,0,0,2,8,0],
+          [0,0,0,4,1,9,0,0,5],
+          [0,0,0,0,8,0,0,7,9]
+        ];
+        solution = [
+          [5,3,4,6,7,8,9,1,2],
+          [6,7,2,1,9,5,3,4,8],
+          [1,9,8,3,4,2,5,6,7],
+          [8,5,9,7,6,1,4,2,3],
+          [4,2,6,8,5,3,7,9,1],
+          [7,1,3,9,2,4,8,5,6],
+          [9,6,1,5,3,7,2,8,4],
+          [2,8,7,4,1,9,6,3,5],
+          [3,4,5,2,8,6,1,7,9]
+        ];
+        renderBoard();
       }
     }
-    function checkSudoku() {
-      let correct = true;
+
+    function renderBoard() {
+      board.innerHTML = '';
+      cells = [];
+      gameOver = false;
+      for (let r = 0; r < 9; r++) {
+        cells[r] = [];
+        for (let c = 0; c < 9; c++) {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.maxLength = 1;
+          input.className = 'sudoku-cell';
+          if (puzzle[r][c] !== 0) {
+            input.value = puzzle[r][c];
+            input.readOnly = true;
+          }
+          input.oninput = () => {
+            if (gameOver) return;
+            input.value = input.value.replace(/[^1-9]/g, '');
+            checkCell(r, c);
+          };
+          board.appendChild(input);
+          cells[r][c] = input;
+        }
+      }
+    }
+
+    function checkCell(r, c) {
+      if (gameOver) return;
+      
+      const val = parseInt(cells[r][c].value, 10);
+      if (val === solution[r][c]) {
+        cells[r][c].classList.add('correct');
+        cells[r][c].classList.remove('wrong');
+        checkWin();
+      } else if (val !== 0) {
+        // Only check and deduct lives if a number is entered (not when deleting)
+        const prevVal = cells[r][c].getAttribute('data-prev-value') || '0';
+        if (prevVal === '0' && val !== 0) {
+          cells[r][c].classList.add('wrong');
+          cells[r][c].classList.remove('correct');
+          lives--;
+          livesDisplay.textContent = '❤️'.repeat(lives);
+          
+          if (lives <= 0) {
+            gameOver = true;
+            message.textContent = 'Game Over! Here\'s the solution:';
+            message.style.color = '#ff70a6';
+            showSolution();
+          } else {
+            message.textContent = `Wrong! ${lives} lives remaining.`;
+            message.style.color = '#fff';
+          }
+        }
+      } else {
+        cells[r][c].classList.remove('correct', 'wrong');
+      }
+      // Store current value for next comparison
+      cells[r][c].setAttribute('data-prev-value', val.toString());
+    }
+
+    function checkWin() {
       for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
-          const val = parseInt(cells[r][c].value, 10);
-          if (val !== solution[r][c]) {
-            correct = false;
-            cells[r][c].style.background = '#ff70a633';
-          } else {
-            if (!cells[r][c].readOnly) cells[r][c].style.background = '#23234a';
+          if (parseInt(cells[r][c].value, 10) !== solution[r][c]) {
+            return;
           }
         }
       }
-      if (correct) {
-        message.textContent = '🎉 Correct! You solved the puzzle!';
-        message.style.color = '#ff70a6';
-      } else {
-        message.textContent = 'Some cells are incorrect. Try again!';
-        message.style.color = '#fff';
+      gameOver = true;
+      message.textContent = '🎉 Congratulations! You solved the puzzle!';
+      message.style.color = '#ff70a6';
+    }
+
+    function showSolution() {
+      for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+          cells[r][c].value = solution[r][c];
+          cells[r][c].classList.add('wrong');
+        }
       }
     }
+
+    function restartGame() {
+      lives = 3;
+      livesDisplay.textContent = '❤️❤️❤️';
+      message.textContent = '';
+      generatePuzzle();
+    }
+
+    // Initialize the game
+    generatePuzzle();
   </script>
 </body>
 </html> 
