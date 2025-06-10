@@ -21,7 +21,9 @@
 body {
     color-scheme: dark;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, #181c2f 0%, #2a225a 60%, #3a1c71 100%);
+    background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #1a1a2e);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
     color: #f3f6ff;
     margin: 0;
     min-height: 100vh;
@@ -30,6 +32,18 @@ body {
     justify-content: center;
     position: relative;
     overflow-x: hidden;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* Star field effect */
@@ -720,4 +734,21 @@ section {
 .toast-hide {
     opacity: 0;
     transform: translateY(-10px) scale(0.98);
+}
+
+.ripple {
+    position: fixed;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(0);
+    animation: ripple 1s linear;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(2);
+        opacity: 0;
+    }
 } 
