@@ -689,4 +689,35 @@ section {
 
 .games-card .chunithm-link:hover {
     background: rgba(255,112,166,0.08);
+}
+
+.toast {
+    position: fixed;
+    right: 2.2rem;
+    bottom: 2.2rem;
+    z-index: 9999;
+    background: rgba(40, 40, 60, 0.95);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    font-size: 1.18rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px) scale(0.98);
+    transition: opacity 0.4s, transform 0.4s;
+}
+
+.toast-show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.toast-hide {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
 } 

@@ -190,7 +190,7 @@
         </div>
     </div>
     <a href="minigames.html" class="minigame-float-btn">Minigames</a>
-    <div id="toast" style="display:none;position:fixed;right:2.2rem;bottom:2.2rem;z-index:9999;"></div>
+    <div id="toast" class="toast" style="display:none;"></div>
     <div id="star-slider-container" style="position:fixed;left:1.5rem;bottom:1.5rem;z-index:10;display:flex;align-items:center;gap:0.7em;background:rgba(30,34,60,0.55);backdrop-filter:blur(6px);border-radius:1em;padding:0.5em 1.1em 0.5em 1em;box-shadow:0 2px 12px #0002;">
       <span style="font-size:1.1em;color:#a29bfe;">★</span>
       <input id="star-slider" type="range" min="50" max="2000" value="500" style="accent-color:#a29bfe;width:110px;vertical-align:middle;">
@@ -223,11 +223,11 @@
     function showToast(msg) {
       const toast = document.getElementById('toast');
       toast.innerHTML = '<span style="font-size:1.3em;vertical-align:middle;">✅</span> <span style="margin-left:0.5em;vertical-align:middle;">'+msg+'</span>';
-      toast.className = 'toast-show';
       toast.style.display = 'block';
+      toast.className = 'toast toast-show';
       setTimeout(() => {
-        toast.className = 'toast-show toast-hide';
-        setTimeout(() => { toast.style.display = 'none'; toast.className = ''; }, 500);
+        toast.className = 'toast toast-show toast-hide';
+        setTimeout(() => { toast.style.display = 'none'; toast.className = 'toast'; }, 400);
       }, 1500);
     }
     document.getElementById('discord-copy-btn').onclick = function() {
