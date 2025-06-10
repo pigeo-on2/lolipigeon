@@ -30,7 +30,7 @@
       display: grid;
       grid-template-columns: repeat(9, 2.2em);
       grid-template-rows: repeat(9, 2.2em);
-      gap: 0.2em;
+      gap: 0.6em;
       background: rgba(30,34,60,0.7);
       border-radius: 12px;
       box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
@@ -43,16 +43,17 @@
       height: 2.2em;
       text-align: center;
       font-size: 1.3em;
-      border: none;
+      border: 1.5px solid #888;
       border-radius: 6px;
       background: #23234a;
       color: #fff;
       outline: none;
       box-shadow: 0 1px 4px #0002;
       transition: background 0.15s;
+      box-sizing: border-box;
     }
     .sudoku-cell:focus {
-      background: #a29bfe44;
+      background: #444a7a;
     }
     .sudoku-cell[readonly] {
       background: #3a1c71;
@@ -60,13 +61,13 @@
       font-weight: 700;
     }
     .sudoku-cell.correct {
-      background: #4CAF50;
+      background: #3cb371;
     }
     .sudoku-cell.wrong {
-      background: #ff70a633;
+      background: #ffb3b3;
     }
     .sudoku-btn, .back-btn, .restart-btn {
-      background: linear-gradient(90deg, #ff70a6 30%, #a29bfe 70%);
+      background: #a29bfe;
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -79,7 +80,7 @@
       transition: background 0.2s, transform 0.2s;
     }
     .sudoku-btn:hover, .back-btn:hover, .restart-btn:hover {
-      background: linear-gradient(90deg, #a29bfe 30%, #ff70a6 70%);
+      background: #ff70a6;
       transform: scale(1.05);
     }
     .sudoku-message {
@@ -98,16 +99,14 @@
       color: #ff70a6;
       margin: 0 0.2em;
     }
-    /* 3x3 grid lines */
-    .sudoku-cell:nth-child(3n) {
-      border-right: 2px solid #ff70a6;
+    .sudoku-cell[data-thick-right="true"] {
+      border-right: 3px solid #ffd700;
     }
-    .sudoku-cell:nth-child(9n) {
-      border-right: none;
+    .sudoku-cell[data-thick-bottom="true"] {
+      border-bottom: 3px solid #ffd700;
     }
-    .sudoku-cell:nth-child(n+19):nth-child(-n+27),
-    .sudoku-cell:nth-child(n+46):nth-child(-n+54) {
-      border-bottom: 2px solid #ff70a6;
+    .sudoku-cell[data-thick-right="true"][data-thick-bottom="true"] {
+      box-shadow: 8px 0 0 0 #ffd700, 0 8px 0 0 #ffd700;
     }
   </style>
 </head>
@@ -179,6 +178,9 @@
           input.type = 'text';
           input.maxLength = 1;
           input.className = 'sudoku-cell';
+          // Add thick border for 3x3 grid
+          if ((c + 1) % 3 === 0 && c !== 8) input.setAttribute('data-thick-right', 'true');
+          if ((r + 1) % 3 === 0 && r !== 8) input.setAttribute('data-thick-bottom', 'true');
           if (puzzle[r][c] !== 0) {
             input.value = puzzle[r][c];
             input.readOnly = true;
@@ -198,19 +200,22 @@
       if (gameOver) return;
       
       const val = parseInt(cells[r][c].value, 10);
-      if (val === solution[r][c]) {
+      const prevVal = cells[r][c].getAttribute('data-prev-value') || '';
+      if (!cells[r][c].value) {
+        // If cell is empty, remove both highlight classes
+        cells[r][c].classList.remove('wrong', 'correct');
+      } else if (val === solution[r][c]) {
         cells[r][c].classList.add('correct');
         cells[r][c].classList.remove('wrong');
         checkWin();
       } else if (val !== 0) {
-        // Only check and deduct lives if a number is entered (not when deleting)
-        const prevVal = cells[r][c].getAttribute('data-prev-value') || '0';
-        if (prevVal === '0' && val !== 0) {
-          cells[r][c].classList.add('wrong');
-          cells[r][c].classList.remove('correct');
+        // Always show wrong highlight if wrong value
+        cells[r][c].classList.add('wrong');
+        cells[r][c].classList.remove('correct');
+        // Deduct life if the value changed and is wrong
+        if (prevVal !== cells[r][c].value) {
           lives--;
           livesDisplay.textContent = '❤️'.repeat(lives);
-          
           if (lives <= 0) {
             gameOver = true;
             message.textContent = 'Game Over! Here\'s the solution:';
@@ -221,11 +226,9 @@
             message.style.color = '#fff';
           }
         }
-      } else {
-        cells[r][c].classList.remove('correct', 'wrong');
       }
       // Store current value for next comparison
-      cells[r][c].setAttribute('data-prev-value', val.toString());
+      cells[r][c].setAttribute('data-prev-value', cells[r][c].value);
     }
 
     function checkWin() {
