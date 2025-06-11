@@ -180,4 +180,28 @@ resetStars();
 drawStars();
 
 // Expose for external use
-window.setStarCount = setStarCount; 
+window.setStarCount = setStarCount;
+
+// Discord 복사 및 토스트 메시지
+window.addEventListener('DOMContentLoaded', function() {
+    const discordBtn = document.getElementById('discord-copy-btn');
+    const toast = document.getElementById('toast');
+    if (discordBtn && toast) {
+        discordBtn.addEventListener('click', function() {
+            const discordId = discordBtn.getAttribute('data-discord-id') || 'pigeon#1234';
+            navigator.clipboard.writeText(discordId).then(() => {
+                showToast('Discord ID copied!');
+            });
+        });
+    }
+
+    function showToast(message) {
+        toast.textContent = message;
+        toast.classList.remove('toast-hide');
+        toast.classList.add('toast-show');
+        setTimeout(() => {
+            toast.classList.remove('toast-show');
+            toast.classList.add('toast-hide');
+        }, 1800);
+    }
+}); 
