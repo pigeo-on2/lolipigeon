@@ -204,4 +204,14 @@ window.addEventListener('DOMContentLoaded', function() {
             toast.classList.add('toast-hide');
         }, 1800);
     }
+
+    // Star slider 연동
+    const starSlider = document.getElementById('star-slider');
+    const starSliderValue = document.getElementById('star-slider-value');
+    if (starSlider && starSliderValue) {
+        starSlider.addEventListener('input', function() {
+            setStarCount(Number(starSlider.value));
+            starSliderValue.textContent = starSlider.value;
+        });
+    }
 }); 

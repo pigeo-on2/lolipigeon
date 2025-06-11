@@ -6,6 +6,8 @@ let songs = [];
 let current = 0;
 let ytPlayer;
 let ytApiLoaded = false;
+let isPlayerReady = false;
+let progressUpdater = null;
 
 const musicTitle = document.getElementById('music-title');
 const musicArtist = document.getElementById('music-artist');
@@ -18,56 +20,123 @@ const currentTimeEl = document.getElementById('current-time');
 const totalTimeEl = document.getElementById('total-time');
 const playlistPopup = document.getElementById('playlist-popup');
 
-function onYouTubeIframeAPIReady() {
-    ytApiLoaded = true;
-    initYTPlayer();
-}
-
-function initYTPlayer() {
-    if (!songs.length) return;
-    ytPlayer = new YT.Player('music-yt', {
-        height: '0',
-        width: '0',
-        videoId: getCurrentVideoId(),
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
-        }
-    });
-}
-
 function getCurrentVideoId() {
     return songs[current].url.replace('youtu.be/', '');
 }
 
-function onPlayerReady() {
-    updateNowPlaying();
+function updateNowPlaying() {
+    musicTitle.textContent = songs.length ? songs[current].title : 'No songs';
 }
 
-function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.ENDED) {
-        nextSong();
+function setPlayerControls(enabled) {
+    playBtn.disabled = !enabled;
+    prevBtn.disabled = !enabled;
+    nextBtn.disabled = !enabled;
+}
+
+function formatTime(sec) {
+    sec = Math.floor(sec);
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function updateProgressUI() {
+    if (!ytPlayer || !isPlayerReady) return;
+    const current = ytPlayer.getCurrentTime();
+    const total = ytPlayer.getDuration();
+    currentTimeEl.textContent = formatTime(current);
+    totalTimeEl.textContent = isNaN(total) ? '0:00' : formatTime(total);
+    // 진행바
+    if (!isNaN(total) && total > 0) {
+        const percent = (current / total) * 100;
+        progressBar.style.width = percent + '%';
+    } else {
+        progressBar.style.width = '0%';
+    }
+}
+
+function startProgressUpdater() {
+    if (progressUpdater) clearInterval(progressUpdater);
+    progressUpdater = setInterval(updateProgressUI, 500);
+}
+function stopProgressUpdater() {
+    if (progressUpdater) clearInterval(progressUpdater);
+    progressUpdater = null;
+}
+
+function onYouTubeIframeAPIReady() {
+    ytApiLoaded = true;
+    if (songs.length) {
+        ytPlayer = new YT.Player('music-yt', {
+            height: '0',
+            width: '0',
+            videoId: getCurrentVideoId(),
+            events: {
+                'onReady': (event) => {
+                    isPlayerReady = true;
+                    setPlayerControls(true);
+                    updateNowPlaying();
+                    console.log('Player is ready');
+                    event.target.playVideo(); // 자동 재생 시도
+                },
+                'onStateChange': (event) => {
+                    if (event.data === YT.PlayerState.PLAYING) {
+                        startProgressUpdater();
+                    } else if (
+                        event.data === YT.PlayerState.PAUSED ||
+                        event.data === YT.PlayerState.ENDED
+                    ) {
+                        stopProgressUpdater();
+                    }
+                    if (event.data === YT.PlayerState.ENDED) {
+                        nextSong();
+                    }
+                }
+            }
+        });
     }
 }
 
 function playSong() {
-    if (ytPlayer) ytPlayer.playVideo();
+    if (ytPlayer && isPlayerReady) {
+        ytPlayer.playVideo();
+        console.log('Play pressed');
+    }
 }
 
 function pauseSong() {
-    if (ytPlayer) ytPlayer.pauseVideo();
+    if (ytPlayer && isPlayerReady) {
+        ytPlayer.pauseVideo();
+        console.log('Pause pressed');
+    }
 }
 
 function nextSong() {
     if (!songs.length) return;
     current = (current + 1) % songs.length;
-    ytPlayer.loadVideoById(getCurrentVideoId());
-    updateNowPlaying();
+    if (ytPlayer && isPlayerReady) {
+        ytPlayer.loadVideoById(getCurrentVideoId());
+        updateNowPlaying();
+        ytPlayer.playVideo(); // 자동 재생
+        console.log('Next song, auto play');
+    }
 }
 
-function updateNowPlaying() {
-    musicTitle.textContent = songs[current].title;
+function prevSong() {
+    if (!songs.length) return;
+    current = (current - 1 + songs.length) % songs.length;
+    if (ytPlayer && isPlayerReady) {
+        ytPlayer.loadVideoById(getCurrentVideoId());
+        updateNowPlaying();
+        ytPlayer.playVideo(); // 자동 재생
+        console.log('Prev song, auto play');
+    }
 }
+
+playBtn.addEventListener('click', playSong);
+nextBtn.addEventListener('click', nextSong);
+prevBtn.addEventListener('click', prevSong);
 
 function loadSongs() {
     fetch(SONGS_URL)
@@ -76,29 +145,31 @@ function loadSongs() {
             songs = list;
             if (songs.length > 0) {
                 current = 0;
-                if (ytApiLoaded) {
-                    initYTPlayer();
-                }
-                playBtn.disabled = false;
-                prevBtn.disabled = false;
-                nextBtn.disabled = false;
                 updateNowPlaying();
+                setPlayerControls(false);
+                if (ytApiLoaded && !ytPlayer) {
+                    onYouTubeIframeAPIReady();
+                }
             } else {
                 musicTitle.textContent = "No songs";
+                setPlayerControls(false);
             }
         });
 }
 
-// YouTube IFrame API 스크립트 동적 삽입
+// YouTube IFrame API script load
 if (!window.YT) {
     const tag = document.createElement('script');
     tag.src = 'https://www.youtube.com/iframe_api';
     document.body.appendChild(tag);
 }
-
 window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
-
-window.addEventListener('DOMContentLoaded', loadSongs);
+window.addEventListener('DOMContentLoaded', () => {
+    // music-yt div 강제 display:block
+    const ytDiv = document.getElementById('music-yt');
+    if (ytDiv) ytDiv.style.display = 'block';
+    loadSongs();
+});
 
 function showPlaylistPopup() {
     if (!songs.length) return;
@@ -117,7 +188,6 @@ function hidePlaylistPopup() {
 
 musicTitle.addEventListener('mouseenter', showPlaylistPopup);
 musicTitle.addEventListener('mouseleave', (e) => {
-    // 0.1초 딜레이로 팝업에 마우스 올릴 시간 줌
     setTimeout(() => {
         if (!playlistPopup.matches(':hover')) hidePlaylistPopup();
     }, 100);
@@ -131,7 +201,12 @@ playlistPopup.addEventListener('click', (e) => {
         const idx = parseInt(item.getAttribute('data-idx'));
         if (!isNaN(idx)) {
             current = idx;
-            loadSong(current);
+            if (ytPlayer && isPlayerReady) {
+                ytPlayer.loadVideoById(getCurrentVideoId());
+                updateNowPlaying();
+                ytPlayer.playVideo(); // 자동 재생
+                console.log('Playlist select, auto play');
+            }
             hidePlaylistPopup();
         }
     }
