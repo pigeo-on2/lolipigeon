@@ -19,6 +19,10 @@ const progressBar = document.getElementById('progress-bar');
 const currentTimeEl = document.getElementById('current-time');
 const totalTimeEl = document.getElementById('total-time');
 const playlistPopup = document.getElementById('playlist-popup');
+const volumeSlider = document.getElementById('volume-slider');
+
+const playIcon = document.getElementById('play-icon');
+const pauseIcon = document.getElementById('pause-icon');
 
 function getCurrentVideoId() {
     return songs[current].url.replace('youtu.be/', '');
@@ -77,16 +81,21 @@ function onYouTubeIframeAPIReady() {
                     isPlayerReady = true;
                     setPlayerControls(true);
                     updateNowPlaying();
+                    volumeSlider.value = event.target.getVolume();
                     console.log('Player is ready');
                     event.target.playVideo(); // 자동 재생 시도
                 },
                 'onStateChange': (event) => {
                     if (event.data === YT.PlayerState.PLAYING) {
+                        playIcon.style.display = 'none';
+                        pauseIcon.style.display = 'block';
                         startProgressUpdater();
                     } else if (
                         event.data === YT.PlayerState.PAUSED ||
                         event.data === YT.PlayerState.ENDED
                     ) {
+                        playIcon.style.display = 'block';
+                        pauseIcon.style.display = 'none';
                         stopProgressUpdater();
                     }
                     if (event.data === YT.PlayerState.ENDED) {
@@ -95,6 +104,16 @@ function onYouTubeIframeAPIReady() {
                 }
             }
         });
+    }
+}
+
+function togglePlayPause() {
+    if (!ytPlayer || !isPlayerReady) return;
+    const state = ytPlayer.getPlayerState();
+    if (state === YT.PlayerState.PLAYING) {
+        pauseSong();
+    } else {
+        playSong();
     }
 }
 
@@ -134,9 +153,14 @@ function prevSong() {
     }
 }
 
-playBtn.addEventListener('click', playSong);
+playBtn.addEventListener('click', togglePlayPause);
 nextBtn.addEventListener('click', nextSong);
 prevBtn.addEventListener('click', prevSong);
+volumeSlider.addEventListener('input', (e) => {
+    if (ytPlayer && isPlayerReady) {
+        ytPlayer.setVolume(e.target.value);
+    }
+});
 
 function loadSongs() {
     fetch(SONGS_URL)

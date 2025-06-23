@@ -682,4 +682,42 @@ section {
     justify-content: center;
     width: 100%;
     margin-top: 1.5rem;
+}
+
+.music-controls {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.music-btn {
+    background: rgba(162, 155, 254, 0.1);
+    color: #a29bfe;
+    border: 1px solid rgba(162, 155, 254, 0.2);
+    border-radius: 12px;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.music-btn svg {
+    width: 22px;
+    height: 22px;
+    stroke: #a29bfe;
+}
+
+.music-btn.play {
+    background: rgba(162, 155, 254, 0.2);
+}
+
+.music-btn:hover {
+    background: rgba(162, 155, 254, 0.25);
+    transform: translateY(-2px);
 } 
