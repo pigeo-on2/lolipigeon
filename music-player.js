@@ -24,6 +24,8 @@ const volumeSlider = document.getElementById('volume-slider');
 const playIcon = document.getElementById('play-icon');
 const pauseIcon = document.getElementById('pause-icon');
 
+const musicPlayerContainer = document.getElementById('music-player-container');
+
 function getCurrentVideoId() {
     return songs[current].url.replace('youtu.be/', '');
 }
@@ -216,8 +218,9 @@ musicTitle.addEventListener('mouseleave', (e) => {
         if (!playlistPopup.matches(':hover')) hidePlaylistPopup();
     }, 100);
 });
-playlistPopup.addEventListener('mouseleave', hidePlaylistPopup);
+
 playlistPopup.addEventListener('mouseenter', showPlaylistPopup);
+playlistPopup.addEventListener('mouseleave', hidePlaylistPopup);
 
 playlistPopup.addEventListener('click', (e) => {
     const item = e.target.closest('.playlist-item');

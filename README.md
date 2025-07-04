@@ -5,6 +5,14 @@ Site host
 
 Rhythm Game Player & Developer의 개인 웹사이트입니다.
 
+## Features
+- 음악 플레이어
+- 별 배경 효과
+- 타이핑 애니메이션
+- 패럴랙스 스크롤
+- 간단한 마우스 파티클
+- 슈팅스타 효과
+
 ## ✨ Features
 
 - 🎵 **YouTube 기반 음악 플레이어** - 재생목록, 진행바, 볼륨 조절
@@ -159,3 +167,9 @@ Pull Request와 Issue를 환영합니다!
 ---
 
 **pigeon** - Rhythm Game Player & Developer 🕊️
+
+## Features
+- 음악 플레이어
+- 별 배경 효과
+- 타이핑 애니메이션
+- 패럴랙스 스크롤

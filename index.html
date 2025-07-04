@@ -22,6 +22,7 @@
 
     <meta name="theme-color" content="#ff70a6">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="responsive-animations.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -142,6 +143,7 @@
     </style>
 </head>
 <body>
+    
     <div class="main-grid">
         <section class="profile-card card">
             <div class="profile-title">
@@ -150,8 +152,8 @@
             </div>
             <div class="profile-desc">Rhythm Game Player & Developer</div>
             <div class="profile-social social-center">
-                <a id="discord-copy-btn" title="Discord" class="social-btn" data-discord-id="pigeo_on2">💬</a>
-                <a href="https://twitter.com/pigeo_on2" title="Twitter" target="_blank" class="social-btn">🕊️</a>
+                <a id="discord-copy-btn" title="Discord" class="social-btn" data-discord-id="pigeo_on2" data-tooltip="클릭 시 Discord ID 복사!">💬</a>
+                <a href="https://twitter.com/pigeo_on2" title="Twitter" target="_blank" class="social-btn" data-tooltip="트위터로 이동">🕊️</a>
             </div>
         </section>
         <section class="about-card card">
@@ -181,7 +183,8 @@
                     <span class="game-detail">エンドマークに希望と涙を添えて AP</span>
                 </div>
                 <div class="game-entry">
-                    <a href="https://chuni.xitora.cc/profile/lolipigeon" target="_blank" class="chunithm-link">
+                    <a href="https://chuni.xitora.cc/profile/lolipigeon" target="_blank" class="chunithm-link chunithm-card">
+                        <span class="chunithm-icon">⭐️</span>
                         <span class="game-title">CHUNITHM</span>
                         <span class="game-detail">CLICK TO SEE RATING</span>
                     </a>
@@ -189,7 +192,7 @@
             </div>
         </section>
     </div>
-    <div id="toast" class="toast" style="display:none;"></div>
+    <div id="toast" class="toast"></div>
     <div id="star-slider-container" style="position:fixed;left:1.5rem;bottom:1.5rem;z-index:10;display:flex;align-items:center;gap:0.7em;background:rgba(30,34,60,0.55);backdrop-filter:blur(6px);border-radius:1em;padding:0.5em 1.1em 0.5em 1em;box-shadow:0 2px 12px #0002;">
       <span style="font-size:1.1em;color:#a29bfe;">★</span>
       <input id="star-slider" type="range" min="50" max="2000" value="500" style="accent-color:#a29bfe;width:110px;vertical-align:middle;">
@@ -225,6 +228,9 @@
       <div class="music-yt" id="music-yt"></div>
     </div>
     <script src="stars.js"></script>
+    <script src="effects.js"></script>
     <script src="music-player.js"></script>
+    <script src="typing-animation.js"></script>
+    <script src="parallax-scroll.js"></script>
 </body>
 </html> 
