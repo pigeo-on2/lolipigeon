@@ -1,9 +1,9 @@
 // streaming-widget.js - 실시간 스트리밍 위젯
 class StreamingWidget {
     constructor() {
-        this.currentPlatform = 'twitch';
         this.streams = [];
         this.isLoading = false;
+        this.youtubeChannelId = 'UCpigeo_on'; // pigeon_on 채널 ID
         
         this.init();
     }
@@ -12,36 +12,17 @@ class StreamingWidget {
         this.bindEvents();
         this.loadStreams();
         
-        // 5분마다 자동 새로고침
+        // 2분마다 자동 새로고침 (생방송 상태 확인)
         setInterval(() => {
             this.loadStreams();
-        }, 5 * 60 * 1000);
+        }, 2 * 60 * 1000);
     }
     
     bindEvents() {
-        // 플랫폼 토글 버튼
-        document.querySelectorAll('.platform-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.switchPlatform(e.target.dataset.platform);
-            });
-        });
-        
         // 새로고침 버튼
         document.getElementById('refresh-streams').addEventListener('click', () => {
             this.loadStreams();
         });
-    }
-    
-    switchPlatform(platform) {
-        this.currentPlatform = platform;
-        
-        // 버튼 상태 업데이트
-        document.querySelectorAll('.platform-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.platform === platform);
-        });
-        
-        // 스트림 다시 로드
-        this.loadStreams();
     }
     
     async loadStreams() {
@@ -51,79 +32,91 @@ class StreamingWidget {
         this.showLoading();
         
         try {
-            if (this.currentPlatform === 'twitch') {
-                await this.loadTwitchStreams();
-            } else {
-                await this.loadYouTubeStreams();
-            }
+            await this.loadYouTubeLiveStream();
         } catch (error) {
             console.error('Failed to load streams:', error);
-            this.showError('스트림을 불러오는데 실패했습니다.');
+            this.showNoStreams();
         } finally {
             this.isLoading = false;
         }
     }
     
-    async loadTwitchStreams() {
-        // Twitch API는 인증이 필요하므로 더미 데이터 사용
-        // 실제 구현시에는 Twitch API 키가 필요합니다
-        const mockTwitchStreams = [
-            {
-                id: 'twitch1',
-                title: '프로젝트 세카이 AP 도전!',
-                streamer: 'pigeo_on2',
-                game: '프로젝트 세카이',
-                viewers: 42,
-                thumbnail: 'https://via.placeholder.com/320x180/ff70a6/ffffff?text=프로젝트+세카이',
-                avatar: 'https://via.placeholder.com/40x40/a29bfe/ffffff?text=P',
-                isLive: true
-            },
-            {
-                id: 'twitch2',
-                title: 'CHUNITHM 레이팅 올리기',
-                streamer: 'pigeo_on2',
-                game: 'CHUNITHM',
-                viewers: 28,
-                thumbnail: 'https://via.placeholder.com/320x180/a29bfe/ffffff?text=CHUNITHM',
-                avatar: 'https://via.placeholder.com/40x40/a29bfe/ffffff?text=P',
-                isLive: true
+    async loadYouTubeLiveStream() {
+        try {
+            // YouTube Data API v3를 사용하여 생방송 상태 확인
+            // 실제 구현시에는 API 키가 필요합니다
+            const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${this.youtubeChannelId}&type=video&eventType=live&key=YOUR_API_KEY`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data.items && data.items.length > 0) {
+                    // 생방송 중인 경우
+                    const liveStream = data.items[0];
+                    this.streams = [{
+                        id: liveStream.id.videoId,
+                        title: liveStream.snippet.title,
+                        streamer: 'pigeo_on',
+                        game: '리듬게임',
+                        viewers: 'LIVE',
+                        thumbnail: liveStream.snippet.thumbnails.high.url,
+                        avatar: 'https://yt3.googleusercontent.com/your-avatar-url',
+                        isLive: true,
+                        channelUrl: `https://www.youtube.com/@pigeo_on`
+                    }];
+                    this.renderStreams();
+                } else {
+                    // 생방송 중이 아닌 경우
+                    this.showNoStreams();
+                }
+            } else {
+                throw new Error('YouTube API request failed');
             }
-        ];
-        
-        this.streams = mockTwitchStreams;
-        this.renderStreams();
+        } catch (error) {
+            console.log('YouTube API not available, using fallback check');
+            // API 키가 없는 경우 간단한 상태 확인
+            await this.checkYouTubeLiveStatus();
+        }
     }
     
-    async loadYouTubeStreams() {
-        // YouTube API는 인증이 필요하므로 더미 데이터 사용
-        const mockYouTubeStreams = [
-            {
-                id: 'yt1',
-                title: '리듬게임 하이라이트',
-                streamer: 'pigeo_on2',
-                game: '리듬게임',
-                viewers: 35,
-                thumbnail: 'https://via.placeholder.com/320x180/ff4757/ffffff?text=리듬게임',
-                avatar: 'https://via.placeholder.com/40x40/ff4757/ffffff?text=P',
-                isLive: true
+    async checkYouTubeLiveStatus() {
+        // 간단한 방법으로 생방송 상태 확인 (API 키 없이)
+        try {
+            // 채널 페이지에서 생방송 상태 확인
+            const channelResponse = await fetch(`https://www.youtube.com/@pigeo_on`);
+            const channelText = await channelResponse.text();
+            
+            // 생방송 중인지 확인하는 간단한 방법
+            if (channelText.includes('LIVE') || channelText.includes('생방송')) {
+                // 생방송 중인 경우 더미 데이터 표시
+                this.streams = [{
+                    id: 'live-stream',
+                    title: '리듬게임 생방송 중! 🎮',
+                    streamer: 'pigeo_on',
+                    game: '리듬게임',
+                    viewers: 'LIVE',
+                    thumbnail: 'https://via.placeholder.com/320x180/ff4757/ffffff?text=LIVE+STREAM',
+                    avatar: 'https://via.placeholder.com/40x40/ff4757/ffffff?text=P',
+                    isLive: true,
+                    channelUrl: 'https://www.youtube.com/@pigeo_on'
+                }];
+                this.renderStreams();
+            } else {
+                this.showNoStreams();
             }
-        ];
-        
-        this.streams = mockYouTubeStreams;
-        this.renderStreams();
+        } catch (error) {
+            // 모든 방법이 실패한 경우 생방송 중이 아님으로 간주
+            this.showNoStreams();
+        }
     }
+    
+
     
     renderStreams() {
         const widget = document.getElementById('streaming-widget');
         
         if (this.streams.length === 0) {
-            widget.innerHTML = `
-                <div class="no-streams">
-                    <div class="icon">📺</div>
-                    <p>현재 라이브 스트림이 없습니다</p>
-                    <small>${this.currentPlatform === 'twitch' ? 'Twitch' : 'YouTube'}에서 스트리밍을 확인해보세요</small>
-                </div>
-            `;
+            this.showNoStreams();
             return;
         }
         
@@ -131,15 +124,14 @@ class StreamingWidget {
         widget.innerHTML = streamsHTML;
         
         // 스트림 카드 클릭 이벤트
-        widget.querySelectorAll('.stream-card').forEach(card => {
+        widget.querySelectorAll('.stream-card').forEach((card, index) => {
             card.addEventListener('click', () => {
-                this.openStream(stream);
+                this.openStream(this.streams[index]);
             });
         });
     }
     
     createStreamCard(stream) {
-        const platformIcon = this.currentPlatform === 'twitch' ? '🟣' : '🔴';
         const statusClass = stream.isLive ? 'live' : 'offline';
         const statusText = stream.isLive ? 'LIVE' : 'OFFLINE';
         
@@ -157,19 +149,15 @@ class StreamingWidget {
                     </div>
                 </div>
                 <img src="${stream.thumbnail}" alt="${stream.title}" class="stream-thumbnail">
-                ${stream.isLive ? `<div class="stream-viewers">👥 ${stream.viewers}명 시청</div>` : ''}
+                ${stream.isLive ? `<div class="stream-viewers">🔴 LIVE NOW</div>` : ''}
             </div>
         `;
     }
     
     openStream(stream) {
-        let url;
-        if (this.currentPlatform === 'twitch') {
-            url = `https://www.twitch.tv/${stream.streamer}`;
-        } else {
-            url = `https://www.youtube.com/channel/${stream.id}`;
+        if (stream.channelUrl) {
+            window.open(stream.channelUrl, '_blank');
         }
-        window.open(url, '_blank');
     }
     
     showLoading() {
@@ -177,79 +165,23 @@ class StreamingWidget {
         widget.innerHTML = `
             <div class="streaming-loading">
                 <div class="streaming-spinner"></div>
-                <span>Loading ${this.currentPlatform === 'twitch' ? 'Twitch' : 'YouTube'} streams...</span>
+                <span>Checking live status...</span>
             </div>
         `;
     }
     
-    showError(message) {
+    showNoStreams() {
         const widget = document.getElementById('streaming-widget');
         widget.innerHTML = `
             <div class="no-streams">
-                <div class="icon">❌</div>
-                <p>${message}</p>
-                <button class="streaming-btn" onclick="streamingWidget.loadStreams()">
-                    <span>🔄</span> 다시 시도
-                </button>
+                <div class="icon">📺</div>
+                <p>there is no livestream</p>
+                <small>YouTube 채널을 구독하고 알림을 받아보세요!</small>
+                <a href="https://www.youtube.com/@pigeo_on" target="_blank" class="youtube-link">
+                    <span>🟥</span> YouTube 채널 바로가기
+                </a>
             </div>
         `;
-    }
-}
-
-// 실제 Twitch API 연동 (선택사항)
-class TwitchAPI {
-    constructor(clientId, clientSecret) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.accessToken = null;
-    }
-    
-    async authenticate() {
-        const response = await fetch('https://id.twitch.tv/oauth2/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                client_id: this.clientId,
-                client_secret: this.clientSecret,
-                grant_type: 'client_credentials'
-            })
-        });
-        
-        const data = await response.json();
-        this.accessToken = data.access_token;
-        return this.accessToken;
-    }
-    
-    async getStreams(userIds) {
-        if (!this.accessToken) {
-            await this.authenticate();
-        }
-        
-        const response = await fetch(`https://api.twitch.tv/helix/streams?user_id=${userIds.join('&user_id=')}`, {
-            headers: {
-                'Client-ID': this.clientId,
-                'Authorization': `Bearer ${this.accessToken}`
-            }
-        });
-        
-        return await response.json();
-    }
-}
-
-// 실제 YouTube API 연동 (선택사항)
-class YouTubeAPI {
-    constructor(apiKey) {
-        this.apiKey = apiKey;
-    }
-    
-    async getLiveStreams(channelIds) {
-        const response = await fetch(
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelIds.join(',')}&type=video&eventType=live&key=${this.apiKey}`
-        );
-        
-        return await response.json();
     }
 }
 
@@ -259,5 +191,5 @@ document.addEventListener('DOMContentLoaded', () => {
     streamingWidget = new StreamingWidget();
 });
 
-// 전역 함수로 노출 (HTML에서 직접 호출 가능)
+// 전역 함수로 노출
 window.streamingWidget = streamingWidget;
