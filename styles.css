@@ -942,3 +942,196 @@ input[type="range"], .progress-container {
         display: none;
     }
 } 
+
+/* 스트리밍 위젯 스타일 */
+.streaming-card {
+    grid-column: span 2;
+}
+
+.streaming-widget {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(162, 155, 254, 0.05);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(162, 155, 254, 0.1);
+}
+
+.streaming-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.streaming-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(162, 155, 254, 0.2);
+    border-top: 3px solid #a29bfe;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.streaming-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.streaming-btn {
+    background: rgba(162, 155, 254, 0.1);
+    color: #a29bfe;
+    border: 1px solid rgba(162, 155, 254, 0.2);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.streaming-btn:hover {
+    background: rgba(162, 155, 254, 0.2);
+    transform: translateY(-1px);
+}
+
+.platform-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.platform-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.platform-btn.active {
+    background: #a29bfe;
+    color: white;
+    border-color: #a29bfe;
+}
+
+.platform-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 스트림 카드 스타일 */
+.stream-card {
+    background: rgba(20, 24, 40, 0.8);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(162, 155, 254, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.stream-card:hover {
+    transform: translateY(-2px);
+    border-color: #a29bfe;
+    box-shadow: 0 8px 25px rgba(162, 155, 254, 0.2);
+}
+
+.stream-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.stream-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.stream-info h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.stream-info p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.stream-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.stream-status.live {
+    color: #ff4757;
+}
+
+.stream-status.offline {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.stream-thumbnail {
+    width: 100%;
+    height: 120px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-top: 0.8rem;
+}
+
+.no-streams {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 2rem;
+}
+
+.no-streams .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .streaming-card {
+        grid-column: span 1;
+    }
+    
+    .streaming-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .platform-toggle {
+        justify-content: center;
+    }
+} 
