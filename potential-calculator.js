@@ -29,9 +29,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('버튼 클릭 이벤트가 연결되었습니다.');
     }, { once: true });
 
-    // 이론치 점수 상수 (한 번만 선언)
-    const THEORY_SCORE = 10001000;
-
     // 계산 함수
     function calculatePotential(basePotential, score) {
         // PURE MEMORY (점수 ≥ 10,000,000) - 점수 모디파이어 2.0
@@ -70,8 +67,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 점수로부터 등급 판별
     function getGrade(score) {
-        if (score === THEORY_SCORE) return 'EX+ (이론치)';
-        if (score >= 10000000 && score < THEORY_SCORE) return 'EX+ (PURE MEMORY)';
+        // 10,000,000 이상은 모두 PURE MEMORY (곡마다 이론치가 다름)
+        if (score >= 10000000) return 'EX+ (PURE MEMORY)';
         if (score >= 9900000 && score < 10000000) return 'EX+';
         if (score >= 9800000) return 'EX';
         if (score >= 9500000) return 'AA';
@@ -112,11 +109,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        if (score < 0 || score > THEORY_SCORE) {
+        if (score < 0) {
             if (typeof showToast === 'function') {
-                showToast(`점수는 0부터 ${THEORY_SCORE.toLocaleString()} 사이의 값이어야 합니다.`);
+                showToast('점수는 0 이상의 값이어야 합니다.');
             } else {
-                alert(`점수는 0부터 ${THEORY_SCORE.toLocaleString()} 사이의 값이어야 합니다.`);
+                alert('점수는 0 이상의 값이어야 합니다.');
             }
             scoreInput.focus();
             return;
@@ -187,13 +184,8 @@ document.addEventListener('DOMContentLoaded', function() {
             this.value = value;
         }
         
-        // 실시간 유효성 검사
-        const score = parseInt(value);
-        if (!isNaN(score) && score > THEORY_SCORE) {
-            this.setCustomValidity(`이론치 점수(${THEORY_SCORE.toLocaleString()})를 초과할 수 없습니다.`);
-        } else {
-            this.setCustomValidity('');
-        }
+        // 실시간 유효성 검사 제거 (곡마다 이론치가 다르므로 상한 제한 없음)
+        this.setCustomValidity('');
     });
 
     // 등급에 따른 색상 클래스 반환
@@ -209,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return 'grade-d';
     }
 
-    // 입력 필드에 최대값 속성 추가
-    scoreInput.setAttribute('max', THEORY_SCORE.toString());
+    // 입력 필드에 최소값 속성만 추가 (최대값 제한 없음 - 곡마다 이론치가 다름)
     scoreInput.setAttribute('min', '0');
+    scoreInput.removeAttribute('max'); // max 속성 제거
 });
