@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potential Calculator - CHUNITHM</title>
+    <meta name="description" content="CHUNITHM 포텐셜 계산기. 악곡 상수와 점수를 입력하여 계산된 포텐셜을 확인하세요." />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lolipigeon.xyz/potentialcalculator.html" />
+    <meta property="og:title" content="Potential Calculator - CHUNITHM" />
+    <meta property="og:description" content="CHUNITHM 포텐셜 계산기. 악곡 상수와 점수를 입력하여 계산된 포텐셜을 확인하세요." />
+    <meta property="og:image" content="https://lolipigeon.xyz/logo.jpg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://lolipigeon.xyz/potentialcalculator.html" />
+    <meta property="twitter:title" content="Potential Calculator - CHUNITHM" />
+    <meta property="twitter:description" content="CHUNITHM 포텐셜 계산기. 악곡 상수와 점수를 입력하여 계산된 포텐셜을 확인하세요." />
+    <meta property="twitter:image" content="https://lolipigeon.xyz/logo.jpg" />
+
+    <meta name="theme-color" content="#ff70a6">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* 계산기 페이지 전용 스타일 */
+        .calculator-page-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .calculator-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .calculator-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff70a6, #a29bfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .calculator-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(162, 155, 254, 0.1);
+            border: 1px solid rgba(162, 155, 254, 0.2);
+        }
+
+        .back-link:hover {
+            background: rgba(162, 155, 254, 0.2);
+            transform: translateX(-4px);
+        }
+
+        .calculator-card {
+            grid-column: span 1;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-page-container">
+        <a href="index.html" class="back-link">
+            <span>←</span> 메인으로 돌아가기
+        </a>
+        
+        <div class="calculator-header">
+            <h1>Potential Calculator</h1>
+            <p>악곡 상수와 점수를 입력하여 포텐셜을 계산하세요</p>
+        </div>
+
+        <!-- Potential Calculator 카드 -->
+        <section class="calculator-card card">
+            <div class="calculator-content">
+                <div class="input-group">
+                    <label for="song-constant">악곡 상수 (Base Potential)</label>
+                    <input type="number" id="song-constant" step="0.01" placeholder="예: 13.5" class="calculator-input">
+                </div>
+                <div class="input-group">
+                    <label for="score">점수 (Score)</label>
+                    <input type="number" id="score" step="1000" placeholder="예: 9800000" class="calculator-input">
+                </div>
+                <button id="calculate-btn" class="calculate-btn">계산하기</button>
+                <div class="result-container" id="result-container">
+                    <div class="result-label">계산된 포텐셜</div>
+                    <div class="result-value" id="result-value">-</div>
+                    <div class="result-formula" id="result-formula"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 토스트 메시지 -->
+    <div id="toast" class="toast"></div>
+
+    <!-- 스크립트 -->
+    <script src="effects.js"></script>
+    <script src="potential-calculator.js"></script>
+</body>
+</html>
+
