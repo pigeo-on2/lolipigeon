@@ -27,6 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <canvas id="stars-canvas"></canvas>
     <div class="main-container">
         <div class="main-grid">
             <!-- 프로필 카드 -->
@@ -48,33 +49,27 @@
                 </div>
             </section>
 
-            <!-- About 카드 -->
+            <!-- About 카드 (Languages 통합) -->
             <section class="about-card card">
                 <h2 class="card-title">About</h2>
                 <div class="card-content">
-                    <p>Rhythm and Development</p>
-                    <p>Python, C++, C#</p>
-                    <p>AI, Security</p>
+                    <p>Rhythm Game Player & Developer</p>
                 </div>
-            </section>
-
-            <!-- Skills 카드 -->
-            <section class="skills-card card">
-                <h2 class="card-title">Languages</h2>
-                <ul class="card-list">
-                    <li><span class="skill-icon">🐍</span> Python</li>
-                    <li><span class="skill-icon">⚡</span> C++</li>
-                    <li><span class="skill-icon">🎮</span> C#</li>
-                </ul>
-            </section>
-
-            <!-- Interests 카드 -->
-            <section class="interests-card card">
-                <h2 class="card-title">Interests</h2>
-                <ul class="card-list">
-                    <li><span class="interest-icon">🤖</span> AI</li>
-                    <li><span class="interest-icon">🔒</span> Security</li>
-                </ul>
+                <div class="card-section">
+                    <h3 class="card-subtitle">Languages</h3>
+                    <ul class="card-list">
+                        <li><span class="skill-icon">🐍</span> Python</li>
+                        <li><span class="skill-icon">⚡</span> C++</li>
+                        <li><span class="skill-icon">🎮</span> C#</li>
+                    </ul>
+                </div>
+                <div class="card-section">
+                    <h3 class="card-subtitle">Interests</h3>
+                    <ul class="card-list">
+                        <li><span class="interest-icon">🤖</span> AI</li>
+                        <li><span class="interest-icon">🔒</span> Security</li>
+                    </ul>
+                </div>
             </section>
 
             <!-- Games 카드 -->
@@ -87,7 +82,7 @@
                     </div>
                     <div class="game-entry">
                         <span class="game-title">CHUNITHM</span>
-                        <span class="game-detail">RATING 17.00 !!</span>
+                        <span class="game-detail">RATING 17.00</span>
                     </div>
                 </div>
             </section>
@@ -103,22 +98,6 @@
                     </a>
                 </div>
             </section>
-
-            <!-- 스트리밍 위젯 -->
-            <section class="streaming-card card">
-                <h2 class="card-title">Live Streams</h2>
-                <div class="streaming-widget" id="streaming-widget">
-                    <div class="streaming-loading">
-                        <div class="streaming-spinner"></div>
-                        <span>Loading streams...</span>
-                    </div>
-                </div>
-                <div class="streaming-controls">
-                    <button class="streaming-btn" id="refresh-streams" title="새로고침">
-                        <span>🔄</span> Refresh
-                    </button>
-                </div>
-            </section>
         </div>
     </div>
 
@@ -127,6 +106,5 @@
 
     <!-- 스크립트 -->
     <script src="effects.js"></script>
-    <script src="streaming-widget.js"></script>
 </body>
 </html> 
