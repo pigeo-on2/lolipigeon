@@ -238,4 +238,33 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         window.requestAnimationFrame(step);
     }
+
+    // 카드 호버링 고급 이펙트 (Spotlight & 3D Tilt) for calculator card
+    const calcCards = document.querySelectorAll('.calculator-card, .card');
+    calcCards.forEach(card => {
+        // effects.js에서 이미 .card에 적용했다면 중복 방지 필요.
+        // potentialcalculator.html에는 calculator-card 또는 card가 있음.
+        if (card.dataset.tiltInitialized) return;
+        card.dataset.tiltInitialized = "true";
+
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -3;
+            const rotateY = ((x - centerX) / centerX) * 3;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        });
+    });
 });
