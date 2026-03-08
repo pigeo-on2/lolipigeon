@@ -1,10 +1,11 @@
 // potential-calculator.js - Potential 계산기
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('Potential Calculator script loaded');
-    
+
     const songConstantInput = document.getElementById('song-constant');
     const scoreInput = document.getElementById('score');
     const calculateBtn = document.getElementById('calculate-btn');
+    const resetBtn = document.getElementById('reset-btn');
     const resultValue = document.getElementById('result-value');
     const resultFormula = document.getElementById('result-formula');
     const resultContainer = document.getElementById('result-container');
@@ -23,9 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     console.log('모든 요소가 성공적으로 로드되었습니다.');
-    
+
     // 버튼 연결 테스트
-    calculateBtn.addEventListener('click', function() {
+    calculateBtn.addEventListener('click', function () {
         console.log('버튼 클릭 이벤트가 연결되었습니다.');
     }, { once: true });
 
@@ -79,13 +80,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 계산 버튼 클릭 이벤트
-    calculateBtn.addEventListener('click', function(e) {
+    calculateBtn.addEventListener('click', function (e) {
         e.preventDefault();
         console.log('계산 버튼 클릭됨');
-        
+
         const basePotential = parseFloat(songConstantInput.value);
         const score = parseInt(scoreInput.value);
-        
+
         console.log('입력값:', { basePotential, score });
 
         // 입력 검증
@@ -123,15 +124,16 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const result = calculatePotential(basePotential, score);
             console.log('계산 결과:', result);
-            
-            // 결과 표시
-            resultValue.textContent = result.potential.toFixed(2);
+
+            // 결과 표시 (애니메이션 적용)
+            const currentVal = parseFloat(resultValue.textContent) || 0;
+            animatePotentialValue(resultValue, currentVal, result.potential, 800);
             resultValue.setAttribute('data-potential', result.potential.toFixed(2));
-            
+
             // 등급에 따른 색상 클래스 추가
             const gradeClass = getGradeClass(result.grade);
             resultContainer.className = `result-container ${gradeClass}`;
-            
+
             // 계산 과정 표시 개선
             const modifierText = result.modifier >= 0 ? `+${result.modifier.toFixed(4)}` : result.modifier.toFixed(4);
             resultFormula.innerHTML = `
@@ -151,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             `;
-            
+
             // 결과 컨테이너 표시 애니메이션
             resultContainer.style.opacity = '0';
             resultContainer.style.transform = 'scale(0.95)';
@@ -160,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultContainer.style.transform = 'scale(1)';
                 resultContainer.style.transition = 'all 0.3s ease';
             }, 50);
-            
+
             console.log('결과 표시 완료');
         } catch (error) {
             console.error('계산 중 에러 발생:', error);
@@ -170,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Enter 키로 계산
     [songConstantInput, scoreInput].forEach(input => {
-        input.addEventListener('keypress', function(e) {
+        input.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 calculateBtn.click();
             }
@@ -178,12 +180,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 입력 시 실시간 포맷팅 (점수)
-    scoreInput.addEventListener('input', function() {
+    scoreInput.addEventListener('input', function () {
         const value = this.value.replace(/[^\d]/g, '');
         if (value !== this.value) {
             this.value = value;
         }
-        
+
         // 실시간 유효성 검사 제거 (곡마다 이론치가 다르므로 상한 제한 없음)
         this.setCustomValidity('');
     });
@@ -204,4 +206,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // 입력 필드에 최소값 속성만 추가 (최대값 제한 없음 - 곡마다 이론치가 다름)
     scoreInput.setAttribute('min', '0');
     scoreInput.removeAttribute('max'); // max 속성 제거
+
+    // === 새로 추가된 요소 (초기화, 애니메이션) ===
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            songConstantInput.value = '';
+            scoreInput.value = '';
+            resultValue.textContent = '-';
+            resultFormula.innerHTML = '';
+            resultContainer.className = 'result-container';
+            songConstantInput.focus();
+        });
+    }
+
+    // 숫자 부드럽게 증가하는 애니메이션
+    function animatePotentialValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            // easeOutExpo
+            const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+            const current = (ease * (end - start) + start).toFixed(2);
+            element.textContent = current;
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                element.textContent = end.toFixed(2);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
 });

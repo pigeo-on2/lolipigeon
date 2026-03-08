@@ -153,7 +153,15 @@
             letter-spacing: 0.01em;
         }
 
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.3rem;
+            z-index: 1;
+        }
+
         .calculate-btn {
+            flex: 2;
             padding: 1.1rem 1.8rem;
             font-size: 1rem;
             font-weight: 700;
@@ -162,10 +170,34 @@
             position: relative;
             overflow: hidden;
             cursor: pointer;
-            z-index: 1;
             border-radius: 14px;
-            margin-top: 0.3rem;
             background: linear-gradient(135deg, #ec4899, #a78bfa);
+            border: none;
+            color: #fff;
+        }
+
+        .reset-btn {
+            flex: 1;
+            padding: 1.1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .reset-btn:active {
+            transform: translateY(0);
         }
 
         .calculate-btn::before {
@@ -363,7 +395,10 @@
                     <input type="number" id="score" step="1000" min="0" placeholder="예: 9800000" class="calculator-input">
                     <div class="input-hint">점수 10,000,000 이상은 모두 모디파이어 2.0입니다</div>
                 </div>
-                <button type="button" id="calculate-btn" class="calculate-btn">계산하기</button>
+                <div class="button-group">
+                    <button type="button" id="reset-btn" class="reset-btn">초기화</button>
+                    <button type="button" id="calculate-btn" class="calculate-btn">계산하기</button>
+                </div>
                 <div class="result-container" id="result-container">
                     <div class="result-label">계산된 포텐셜</div>
                     <div class="result-value" id="result-value">-</div>

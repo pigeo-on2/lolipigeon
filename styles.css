@@ -78,16 +78,17 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), var(--accent-secondary), transparent);
     opacity: 0;
     transition: opacity 0.4s ease;
+    z-index: 10;
 }
 
 .card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 40px rgba(167, 139, 250, 0.25);
-    border-color: rgba(167, 139, 250, 0.3);
+    box-shadow: 0 12px 40px rgba(167, 139, 250, 0.25), inset 0 0 20px rgba(167, 139, 250, 0.05);
+    border-color: rgba(167, 139, 250, 0.35);
 }
 
 .card:hover::before {
@@ -557,6 +558,163 @@ body {
     background: rgba(167, 139, 250, 0.2);
     border-radius: 8px;
     margin-bottom: 0.8rem;
+}
+
+/* 추가 위젯 스타일 (시계, 명언, 깃허브) */
+.clock-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0;
+}
+
+.clock-time {
+    font-size: 2.8rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, #ffffff, var(--primary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
+    filter: drop-shadow(0 2px 8px rgba(167, 139, 250, 0.3));
+}
+
+.clock-date {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+
+.clock-timezone {
+    font-size: 0.85rem;
+    color: var(--accent-color);
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.quote-container {
+    position: relative;
+    padding: 0.5rem 0.5rem 1.5rem 0.5rem;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.quote-text {
+    font-size: 1.15rem;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.quote-author {
+    font-size: 0.95rem;
+    color: var(--accent-color);
+    font-weight: 600;
+    text-align: right;
+}
+
+.quote-refresh-btn {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: rgba(167, 139, 250, 0.15);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.quote-refresh-btn:hover {
+    background: rgba(167, 139, 250, 0.35);
+    transform: rotate(180deg);
+}
+
+.github-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.github-link {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1.2rem;
+    background: rgba(167, 139, 250, 0.12);
+    border: 1.5px solid rgba(167, 139, 250, 0.2);
+    border-radius: 14px;
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.github-link:hover {
+    background: rgba(167, 139, 250, 0.2);
+    border-color: rgba(167, 139, 250, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(167, 139, 250, 0.2);
+}
+
+.github-icon {
+    font-size: 1.6rem;
+}
+
+.github-username {
+    flex: 1;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 1.05rem;
+}
+
+.github-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.stat-item {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(167, 139, 250, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+    border-color: rgba(167, 139, 250, 0.3);
+    background: rgba(15, 23, 42, 0.6);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent-color);
 }
 
 /* 반응형 디자인 */

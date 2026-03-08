@@ -87,6 +87,16 @@
                 </div>
             </section>
 
+            <!-- 시계 위젯 -->
+            <section class="clock-card card">
+                <h2 class="card-title">Time</h2>
+                <div class="clock-container">
+                    <div class="clock-time" id="clock-time">--:--:--</div>
+                    <div class="clock-date" id="clock-date">-- --- ----</div>
+                    <div class="clock-timezone" id="clock-timezone">KST</div>
+                </div>
+            </section>
+
             <!-- Tools 카드 -->
             <section class="tools-card card">
                 <h2 class="card-title">Tools</h2>
@@ -96,6 +106,40 @@
                         <span class="tool-name">Potential Calculator</span>
                         <span class="tool-arrow">→</span>
                     </a>
+                </div>
+            </section>
+
+            <!-- 랜덤 명언 위젯 -->
+            <section class="quote-card card">
+                <h2 class="card-title">Quote</h2>
+                <div class="quote-container">
+                    <div class="quote-text" id="quote-text">Loading...</div>
+                    <div class="quote-author" id="quote-author"></div>
+                    <button class="quote-refresh-btn" id="quote-refresh-btn" title="새로운 명언">
+                        <span>🔄</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- GitHub 통계 위젯 -->
+            <section class="github-card card">
+                <h2 class="card-title">GitHub</h2>
+                <div class="github-container">
+                    <a href="https://github.com/pigeo_on" target="_blank" class="github-link">
+                        <span class="github-icon">🐙</span>
+                        <span class="github-username">@pigeo_on</span>
+                        <span class="tool-arrow">→</span>
+                    </a>
+                    <div class="github-stats" id="github-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Repositories</span>
+                            <span class="stat-value" id="repo-count">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Followers</span>
+                            <span class="stat-value" id="followers-count">-</span>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
