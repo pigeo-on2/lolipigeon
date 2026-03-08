@@ -1,37 +1,37 @@
 // effects.js - 별 효과 및 기타 기능들
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // 별 효과 초기화
     initStars();
-    
+
     // 시계 위젯 초기화
     initClock();
-    
+
     // 명언 위젯 초기화
     initQuotes();
-    
+
     // 깃허브 통계 초기화
     initGithubStats();
-    
+
     // Discord ID 복사 기능
     const discordBtn = document.getElementById('discord-copy-btn');
     if (discordBtn) {
-        discordBtn.addEventListener('click', function() {
+        discordBtn.addEventListener('click', function () {
             const discordId = this.getAttribute('data-discord-id');
-            navigator.clipboard.writeText(discordId).then(function() {
+            navigator.clipboard.writeText(discordId).then(function () {
                 showToast('Discord ID가 복사되었습니다!');
-            }).catch(function() {
+            }).catch(function () {
                 showToast('복사에 실패했습니다.');
             });
         });
     }
 
     // 토스트 메시지 표시 함수
-    window.showToast = function(message) {
+    window.showToast = function (message) {
         const toast = document.getElementById('toast');
         if (toast) {
             toast.textContent = message;
             toast.classList.add('show');
-            
+
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
@@ -98,7 +98,7 @@ function initStars() {
         update() {
             // 밝기 변화 (부드러운 반짝임)
             this.brightness += this.twinkleSpeed * this.twinkleDirection;
-            
+
             // 밝기 범위 제한
             if (this.brightness >= 1) {
                 this.brightness = 1;
@@ -134,8 +134,8 @@ function initStars() {
         }
     }
 
-    // 별 생성 (100-150개)
-    const starCount = Math.floor(Math.random() * 50) + 100;
+    // 별 생성 (갯수 줄이기 50-80개)
+    const starCount = Math.floor(Math.random() * 30) + 50;
     for (let i = 0; i < starCount; i++) {
         stars.push(new Star());
     }
@@ -145,7 +145,7 @@ function initStars() {
     let mouseY = canvas.height / 2;
     let targetX = mouseX;
     let targetY = mouseY;
-    
+
     window.addEventListener('mousemove', (e) => {
         targetX = e.clientX;
         targetY = e.clientY;
@@ -154,22 +154,22 @@ function initStars() {
     // 애니메이션 함수
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // 부드러운 패럴랙스 (목표 위치로 서서히 이동)
-        mouseX += (targetX - mouseX) * 0.05;
-        mouseY += (targetY - mouseY) * 0.05;
-        
+
+        // 부드러운 패럴랙스 (목표 위치로 서서히 이동되나 매우 천천히)
+        mouseX += (targetX - mouseX) * 0.02;
+        mouseY += (targetY - mouseY) * 0.02;
+
         // 화면 중심점 변위 계산 (-1 ~ 1)
         const dx = (mouseX - canvas.width / 2) / (canvas.width / 2);
         const dy = (mouseY - canvas.height / 2) / (canvas.height / 2);
-        
+
         stars.forEach(star => {
             star.update();
-            
-            // 임시 위치에 그려 패럴랙스 적용 (깊이(크기)에 따라 다르게)
-            const offsetX = dx * star.size * 10;
-            const offsetY = dy * star.size * 10;
-            
+
+            // 패럴랙스 적용 (깊이에 따라 다르게, 아주 미세한 움직임)
+            const offsetX = dx * star.size * 3;
+            const offsetY = dy * star.size * 3;
+
             ctx.beginPath();
             const alpha = star.brightness;
             const color = `rgba(255, 255, 255, ${alpha})`;
@@ -206,14 +206,14 @@ function initStars() {
 function initClock() {
     const timeEl = document.getElementById('clock-time');
     const dateEl = document.getElementById('clock-date');
-    
+
     if (!timeEl || !dateEl) return;
 
     function updateTime() {
         const now = new Date();
         const optionsTime = { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
         const optionsDate = { timeZone: 'Asia/Seoul', year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' };
-        
+
         timeEl.textContent = now.toLocaleTimeString('en-US', optionsTime);
         dateEl.textContent = now.toLocaleDateString('en-US', optionsDate);
     }
@@ -227,7 +227,7 @@ function initQuotes() {
     const textEl = document.getElementById('quote-text');
     const authorEl = document.getElementById('quote-author');
     const btn = document.getElementById('quote-refresh-btn');
-    
+
     if (!textEl || !authorEl || !btn) return;
 
     const quotes = [
@@ -244,19 +244,19 @@ function initQuotes() {
     function showRandomQuote() {
         textEl.style.opacity = '0';
         authorEl.style.opacity = '0';
-        
+
         setTimeout(() => {
             const random = quotes[Math.floor(Math.random() * quotes.length)];
             textEl.textContent = `"${random.text}"`;
             authorEl.textContent = `- ${random.author}`;
-            
+
             textEl.style.opacity = '1';
             authorEl.style.opacity = '1';
         }, 300);
     }
 
     showRandomQuote();
-    
+
     btn.addEventListener('click', showRandomQuote);
 }
 
@@ -264,19 +264,19 @@ function initQuotes() {
 async function initGithubStats() {
     const repoCountEl = document.getElementById('repo-count');
     const followersCountEl = document.getElementById('followers-count');
-    
+
     if (!repoCountEl || !followersCountEl) return;
 
     try {
         // github username is 'pigeo_on' according to link, but username on Github is likely 'pigeo_on' or 'pigeo-on'.
         // the provided link is https://github.com/pigeo_on
         const response = await fetch('https://api.github.com/users/pigeo_on');
-        
+
         if (!response.ok) {
             // fallback if pigeo_on fails due to Github limits or rules
             const fallbackResponse = await fetch('https://api.github.com/users/pigeo-on');
             if (!fallbackResponse.ok) throw new Error('Cannot fetch user');
-            
+
             const data = await fallbackResponse.json();
             animateValue(repoCountEl, 0, data.public_repos, 1500);
             animateValue(followersCountEl, 0, data.followers, 1500);
@@ -284,11 +284,11 @@ async function initGithubStats() {
         }
 
         const data = await response.json();
-        
+
         // 숫자 카운트업 애니메이션 적용
         animateValue(repoCountEl, 0, data.public_repos, 1500);
         animateValue(followersCountEl, 0, data.followers, 1500);
-        
+
     } catch (e) {
         console.error('Failed to fetch Github stats:', e);
         repoCountEl.textContent = 'N/A';
